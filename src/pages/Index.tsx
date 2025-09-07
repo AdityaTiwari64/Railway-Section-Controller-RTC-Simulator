@@ -195,12 +195,23 @@ const initialTrackSections: TrackSection[] = [
 ];
 
 const scenarios = [
-  { id: 'normal', name: 'Normal Operations', description: 'Standard traffic flow with clear weather' },
-  { id: 'rush_hour', name: 'Rush Hour', description: 'High passenger volume and congestion' },
-  { id: 'maintenance', name: 'Track Maintenance', description: 'Reduced capacity and speed restrictions' },
-  { id: 'emergency', name: 'Emergency Response', description: 'Priority routing and emergency protocols' },
-  { id: 'weather', name: 'Severe Weather', description: 'Adverse weather conditions affecting operations' },
-  { id: 'breakdown', name: 'Equipment Failure', description: 'Train breakdowns and maintenance issues' }
+  { id: 'normal', name: 'Normal Operations', description: 'Standard traffic flow with clear weather', difficulty: 'Easy' },
+  { id: 'rush_hour', name: 'Rush Hour', description: 'High passenger volume and congestion', difficulty: 'Medium' },
+  { id: 'maintenance', name: 'Track Maintenance', description: 'Reduced capacity and speed restrictions', difficulty: 'Medium' },
+  { id: 'emergency', name: 'Emergency Response', description: 'Priority routing and emergency protocols', difficulty: 'Hard' },
+  { id: 'weather', name: 'Severe Weather', description: 'Adverse weather conditions affecting operations', difficulty: 'Hard' },
+  { id: 'breakdown', name: 'Equipment Failure', description: 'Train breakdowns and maintenance issues', difficulty: 'Expert' }
+];
+
+const achievementDefinitions = [
+  { id: 'first_train', name: 'First Steps', description: 'Manage your first train', icon: '🚂', condition: (stats: any) => stats.totalTrainsManaged >= 1 },
+  { id: 'signal_master', name: 'Signal Master', description: 'Change 50 signals', icon: '🚦', condition: (stats: any) => stats.totalSignalsChanged >= 50 },
+  { id: 'emergency_hero', name: 'Emergency Hero', description: 'Handle 10 emergencies', icon: '🚨', condition: (stats: any) => stats.totalEmergenciesHandled >= 10 },
+  { id: 'perfect_run', name: 'Perfect Run', description: 'Achieve 100% punctuality', icon: '⭐', condition: (stats: any) => stats.perfectRuns >= 1 },
+  { id: 'speed_demon', name: 'Speed Demon', description: 'Complete a scenario in under 2 minutes', icon: '⚡', condition: (stats: any) => stats.bestTime < 120 },
+  { id: 'weather_warrior', name: 'Weather Warrior', description: 'Successfully manage operations in all weather conditions', icon: '🌦️', condition: (stats: any) => stats.weatherMaster },
+  { id: 'network_optimizer', name: 'Network Optimizer', description: 'Achieve 95%+ efficiency', icon: '🎯', condition: (stats: any) => stats.bestEfficiency >= 95 },
+  { id: 'veteran_controller', name: 'Veteran Controller', description: 'Play for over 1 hour total', icon: '🏆', condition: (stats: any) => stats.totalPlayTime >= 3600 }
 ];
 
 const tutorialSteps = [
@@ -270,6 +281,19 @@ const Index = () => {
   const [showTrainDetails, setShowTrainDetails] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [gameMode, setGameMode] = useState<'freeplay' | 'challenge' | 'time_trial'>('freeplay');
+  const [challengeTime, setChallengeTime] = useState(300); // 5 minutes
+  const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
+  const [gameStats, setGameStats] = useState({
+    totalTrainsManaged: 0,
+    totalSignalsChanged: 0,
+    totalEmergenciesHandled: 0,
+    bestScore: 0,
+    totalPlayTime: 0,
+    perfectRuns: 0
+  });
 
   // KPIs
   const [kpis, setKpis] = useState({
@@ -473,8 +497,21 @@ const Index = () => {
         const punctualityBonus = punctualityRate > 90 ? 5 : punctualityRate > 80 ? 2 : -5;
         const actionPenalty = userActions > 20 ? -2 : 0;
         const emergencyPenalty = emergencyMode ? -10 : 0;
-        return Math.max(0, Math.min(100, prev + punctualityBonus + actionPenalty + emergencyPenalty + (Math.random() - 0.5) * 2));
+        const newScore = Math.max(0, Math.min(100, prev + punctualityBonus + actionPenalty + emergencyPenalty + (Math.random() - 0.5) * 2));
+        
+        // Update game stats
+        setGameStats(prev => ({
+          ...prev,
+          bestScore: Math.max(prev.bestScore, newScore),
+          totalPlayTime: prev.totalPlayTime + 1,
+          perfectRuns: punctualityRate === 100 ? prev.perfectRuns + 1 : prev.perfectRuns
+        }));
+        
+        return newScore;
       });
+
+      // Check achievements
+      checkAchievements();
 
     }, 2000 / simulationSpeed[0]);
 
@@ -514,6 +551,7 @@ const Index = () => {
         const nextIndex = (currentIndex + 1) % statuses.length;
         
         setUserActions(prev => prev + 1);
+        setGameStats(prev => ({ ...prev, totalSignalsChanged: prev.totalSignalsChanged + 1 }));
         setEvents(prev => [{
           id: Date.now().toString(),
           time: new Date(),
@@ -568,6 +606,9 @@ const Index = () => {
 
   const handleEmergencyResponse = () => {
     setEmergencyMode(!emergencyMode);
+    if (!emergencyMode) {
+      setGameStats(prev => ({ ...prev, totalEmergenciesHandled: prev.totalEmergenciesHandled + 1 }));
+    }
     setEvents(prev => [{
       id: Date.now().toString(),
       time: new Date(),
@@ -575,7 +616,7 @@ const Index = () => {
       type: 'emergency',
       severity: 'critical',
       autoResolve: false
-    }, ...prev]);
+    } as SimulationEvent, ...prev]);
   };
 
   const handleWeatherChange = (newWeather: 'clear' | 'rain' | 'snow' | 'fog') => {
@@ -608,6 +649,76 @@ const Index = () => {
   const handleTutorialStart = () => {
     setShowTutorial(true);
     setTutorialStep(0);
+  };
+
+  const checkAchievements = () => {
+    const newAchievements = achievementDefinitions.filter(achievementDef => 
+      !unlockedAchievements.includes(achievementDef.id) && achievementDef.condition(gameStats)
+    );
+    
+    if (newAchievements.length > 0) {
+      setUnlockedAchievements(prev => [...prev, ...newAchievements.map(a => a.id)]);
+      setEvents(prev => [{
+        id: Date.now().toString(),
+        time: new Date(),
+        message: `🏆 Achievement Unlocked: ${newAchievements[0].name}`,
+        type: 'success',
+        severity: 'high',
+        autoResolve: true
+      } as SimulationEvent, ...prev]);
+    }
+  };
+
+  const handleGameModeChange = (mode: 'freeplay' | 'challenge' | 'time_trial') => {
+    setGameMode(mode);
+    if (mode === 'time_trial') {
+      setChallengeTime(300); // 5 minutes
+    }
+    setEvents(prev => [{
+      id: Date.now().toString(),
+      time: new Date(),
+      message: `Game mode changed to ${mode.replace('_', ' ')}`,
+      type: 'info',
+      severity: 'low',
+      autoResolve: true
+    } as SimulationEvent, ...prev]);
+  };
+
+  const handleQuickAction = (action: string) => {
+    setUserActions(prev => prev + 1);
+    setGameStats(prev => ({ ...prev, totalTrainsManaged: prev.totalTrainsManaged + 1 }));
+    
+    // Apply quick action effects
+    switch (action) {
+      case 'clear_all_delays':
+        setStations(prev => prev.map(station => ({
+          ...station,
+          trains: station.trains.map(train => ({ ...train, status: 'on-time' as const }))
+        })));
+        break;
+      case 'optimize_routes':
+        setStations(prev => prev.map(station => ({
+          ...station,
+          trains: station.trains.map(train => ({ ...train, speed: Math.min(140, train.speed + 20) }))
+        })));
+        break;
+      case 'emergency_clear':
+        setEmergencyMode(false);
+        setStations(prev => prev.map(station => ({
+          ...station,
+          trains: station.trains.map(train => ({ ...train, priority: 'normal' as const }))
+        })));
+        break;
+    }
+    
+    setEvents(prev => [{
+      id: Date.now().toString(),
+      time: new Date(),
+      message: `Quick action: ${action.replace('_', ' ')} executed`,
+      type: 'success',
+      severity: 'medium',
+      autoResolve: true
+    } as SimulationEvent, ...prev]);
   };
 
   const getTrainColor = (status: string, type: string) => {
@@ -657,15 +768,39 @@ const Index = () => {
           </div>
           
           <div className="flex items-center gap-6">
-            <Button
-              onClick={handleTutorialStart}
-              variant="outline"
-              className="rounded-lg"
-              style={{ borderColor: COLORS.primaryAccent, color: COLORS.darkAccent }}
-            >
-              <User className="h-4 w-4 mr-2" />
-              Tutorial
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleTutorialStart}
+                variant="outline"
+                size="sm"
+                className="rounded-lg"
+                style={{ borderColor: COLORS.primaryAccent, color: COLORS.darkAccent }}
+              >
+                <User className="h-4 w-4 mr-1" />
+                Tutorial
+              </Button>
+              
+              <Button
+                onClick={() => setShowAchievements(true)}
+                variant="outline"
+                size="sm"
+                className="rounded-lg"
+                style={{ borderColor: COLORS.warning, color: COLORS.warning }}
+              >
+                <BarChart3 className="h-4 w-4 mr-1" />
+                Achievements ({unlockedAchievements.length})
+              </Button>
+              
+              <Button
+                onClick={() => setShowSettings(true)}
+                variant="outline"
+                size="sm"
+                className="rounded-lg"
+                style={{ borderColor: COLORS.textSecondary, color: COLORS.textSecondary }}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            </div>
             
             <div className="flex items-center gap-4">
               <div className="text-center">
@@ -693,6 +828,37 @@ const Index = () => {
         {/* Left Panel - Control Center */}
         <div className="w-80 bg-white border-r p-6" style={{ borderColor: COLORS.border }}>
           <div className="space-y-6">
+            {/* Game Mode Selection */}
+            <Card className="border rounded-xl p-4" style={{ backgroundColor: COLORS.cardBackground, borderColor: COLORS.border }}>
+              <h3 className="font-semibold mb-4">Game Mode</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  size="sm"
+                  variant={gameMode === 'freeplay' ? 'default' : 'outline'}
+                  onClick={() => handleGameModeChange('freeplay')}
+                  className="text-xs"
+                >
+                  Freeplay
+                </Button>
+                <Button
+                  size="sm"
+                  variant={gameMode === 'challenge' ? 'default' : 'outline'}
+                  onClick={() => handleGameModeChange('challenge')}
+                  className="text-xs"
+                >
+                  Challenge
+                </Button>
+                <Button
+                  size="sm"
+                  variant={gameMode === 'time_trial' ? 'default' : 'outline'}
+                  onClick={() => handleGameModeChange('time_trial')}
+                  className="text-xs"
+                >
+                  Time Trial
+                </Button>
+              </div>
+            </Card>
+
             {/* Simulation Controls */}
             <Card className="border rounded-xl p-4" style={{ backgroundColor: COLORS.cardBackground, borderColor: COLORS.border }}>
               <h3 className="font-semibold mb-4">Simulation Control</h3>
@@ -710,6 +876,9 @@ const Index = () => {
                           <div>
                             <div className="font-medium">{s.name}</div>
                             <div className="text-xs text-gray-500">{s.description}</div>
+                            <div className="text-xs font-semibold" style={{ color: s.difficulty === 'Easy' ? COLORS.success : s.difficulty === 'Medium' ? COLORS.warning : s.difficulty === 'Hard' ? COLORS.error : COLORS.textMuted }}>
+                              {s.difficulty}
+                            </div>
                           </div>
                         </SelectItem>
                       ))}
@@ -740,6 +909,43 @@ const Index = () => {
                 >
                   {simulationMode ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
                   {simulationMode ? "Stop Simulation" : "Start Simulation"}
+                </Button>
+              </div>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="border rounded-xl p-4" style={{ backgroundColor: COLORS.cardBackground, borderColor: COLORS.border }}>
+              <h3 className="font-semibold mb-4">Quick Actions</h3>
+              <div className="space-y-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickAction('clear_all_delays')}
+                  className="w-full justify-start"
+                  style={{ borderColor: COLORS.success, color: COLORS.success }}
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Clear All Delays
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickAction('optimize_routes')}
+                  className="w-full justify-start"
+                  style={{ borderColor: COLORS.primaryAccent, color: COLORS.darkAccent }}
+                >
+                  <Target className="h-4 w-4 mr-2" />
+                  Optimize Routes
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickAction('emergency_clear')}
+                  className="w-full justify-start"
+                  style={{ borderColor: COLORS.error, color: COLORS.error }}
+                >
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  Clear Emergency
                 </Button>
               </div>
             </Card>
@@ -1409,6 +1615,122 @@ const Index = () => {
               >
                 {tutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next'}
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Achievements Modal */}
+      {showAchievements && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-4xl mx-4 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold" style={{ color: COLORS.textPrimary }}>
+                🏆 Achievements
+              </h2>
+              <Button
+                onClick={() => setShowAchievements(false)}
+                variant="outline"
+                size="sm"
+                className="rounded-lg"
+              >
+                ✕
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {achievementDefinitions.map(achievementDef => {
+                const isUnlocked = unlockedAchievements.includes(achievementDef.id);
+                return (
+                  <Card key={achievementDef.id} className={`p-4 rounded-xl border ${isUnlocked ? 'opacity-100' : 'opacity-50'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">{achievementDef.icon}</div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold" style={{ color: COLORS.textPrimary }}>
+                          {achievementDef.name}
+                        </h3>
+                        <p className="text-sm" style={{ color: COLORS.textSecondary }}>
+                          {achievementDef.description}
+                        </p>
+                        <div className="mt-2">
+                          <Badge 
+                            className="text-xs"
+                            style={{ 
+                              backgroundColor: isUnlocked ? COLORS.success : COLORS.textMuted,
+                              color: 'white'
+                            }}
+                          >
+                            {isUnlocked ? 'Unlocked' : 'Locked'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-2xl mx-4 shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold" style={{ color: COLORS.textPrimary }}>
+                ⚙️ Settings
+              </h2>
+              <Button
+                onClick={() => setShowSettings(false)}
+                variant="outline"
+                size="sm"
+                className="rounded-lg"
+              >
+                ✕
+              </Button>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-semibold mb-4" style={{ color: COLORS.textPrimary }}>Game Statistics</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: COLORS.lightGray }}>
+                    <div className="text-sm" style={{ color: COLORS.textSecondary }}>Trains Managed</div>
+                    <div className="text-lg font-bold" style={{ color: COLORS.textPrimary }}>{gameStats.totalTrainsManaged}</div>
+                  </div>
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: COLORS.lightGray }}>
+                    <div className="text-sm" style={{ color: COLORS.textSecondary }}>Signals Changed</div>
+                    <div className="text-lg font-bold" style={{ color: COLORS.textPrimary }}>{gameStats.totalSignalsChanged}</div>
+                  </div>
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: COLORS.lightGray }}>
+                    <div className="text-sm" style={{ color: COLORS.textSecondary }}>Emergencies Handled</div>
+                    <div className="text-lg font-bold" style={{ color: COLORS.textPrimary }}>{gameStats.totalEmergenciesHandled}</div>
+                  </div>
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: COLORS.lightGray }}>
+                    <div className="text-sm" style={{ color: COLORS.textSecondary }}>Best Score</div>
+                    <div className="text-lg font-bold" style={{ color: COLORS.textPrimary }}>{gameStats.bestScore}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-4" style={{ color: COLORS.textPrimary }}>Game Preferences</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: COLORS.textSecondary }}>Auto-save progress</span>
+                    <input type="checkbox" defaultChecked className="rounded" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: COLORS.textSecondary }}>Sound effects</span>
+                    <input type="checkbox" defaultChecked className="rounded" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: COLORS.textSecondary }}>Visual effects</span>
+                    <input type="checkbox" defaultChecked className="rounded" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
