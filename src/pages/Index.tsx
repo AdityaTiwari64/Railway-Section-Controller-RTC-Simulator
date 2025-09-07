@@ -162,9 +162,9 @@ const initialStations: Station[] = [
     windSpeed: 8,
     trackConditions: 'good',
     trains: [
-      { id: "EXP001", name: "Express 001", type: "express", status: "on-time", platform: 1, speed: 120, destination: "North Terminal", eta: new Date(Date.now() + 300000), passengers: 180, capacity: 200, currentSection: "Central-North", progress: 75, priority: 'normal', fuelLevel: 85, maintenanceStatus: 'good' },
-      { id: "LOC456", name: "Local 456", type: "passenger", status: "minor-delay", platform: 3, speed: 80, destination: "South Junction", eta: new Date(Date.now() + 600000), passengers: 95, capacity: 150, currentSection: "Central-South", progress: 45, priority: 'normal', fuelLevel: 92, maintenanceStatus: 'good' },
-      { id: "FRT789", name: "Freight 789", type: "freight", status: "on-time", platform: 6, speed: 60, destination: "Industrial Zone", eta: new Date(Date.now() + 900000), currentSection: "Central-Industrial", progress: 20, priority: 'low', fuelLevel: 78, maintenanceStatus: 'warning' }
+      { id: "THUNDER_EXPRESS", name: "Thunder Express", type: "express", status: "on-time", platform: 1, speed: 120, destination: "North Terminal", eta: new Date(Date.now() + 300000), passengers: 180, capacity: 200, currentSection: "Central-North", progress: 75, priority: 'normal', fuelLevel: 85, maintenanceStatus: 'good' },
+      { id: "CITY_CONNECTOR", name: "City Connector", type: "passenger", status: "minor-delay", platform: 3, speed: 80, destination: "South Junction", eta: new Date(Date.now() + 600000), passengers: 95, capacity: 150, currentSection: "Central-South", progress: 45, priority: 'normal', fuelLevel: 92, maintenanceStatus: 'good' },
+      { id: "IRON_HAULER", name: "Iron Hauler", type: "freight", status: "on-time", platform: 6, speed: 60, destination: "Industrial Zone", eta: new Date(Date.now() + 900000), currentSection: "Central-Industrial", progress: 20, priority: 'low', fuelLevel: 78, maintenanceStatus: 'warning' }
     ]
   },
   {
@@ -178,8 +178,8 @@ const initialStations: Station[] = [
     windSpeed: 15,
     trackConditions: 'wet',
     trains: [
-      { id: "EXP002", name: "Express 002", type: "express", status: "approaching", speed: 110, destination: "Central Station", eta: new Date(Date.now() + 240000), passengers: 165, capacity: 200, currentSection: "North-Central", progress: 90, priority: 'high', fuelLevel: 88, maintenanceStatus: 'good' },
-      { id: "REG012", name: "Regional 012", type: "passenger", status: "significant-delay", platform: 2, speed: 0, destination: "South Terminal", eta: new Date(Date.now() + 1200000), passengers: 120, capacity: 180, currentSection: "North-South", progress: 0, priority: 'normal', fuelLevel: 95, maintenanceStatus: 'critical' }
+      { id: "ARCTIC_RUNNER", name: "Arctic Runner", type: "express", status: "approaching", speed: 110, destination: "Central Station", eta: new Date(Date.now() + 240000), passengers: 165, capacity: 200, currentSection: "North-Central", progress: 90, priority: 'high', fuelLevel: 88, maintenanceStatus: 'good' },
+      { id: "NORTHERN_BREEZE", name: "Northern Breeze", type: "passenger", status: "significant-delay", platform: 2, speed: 0, destination: "South Terminal", eta: new Date(Date.now() + 1200000), passengers: 120, capacity: 180, currentSection: "North-South", progress: 0, priority: 'normal', fuelLevel: 95, maintenanceStatus: 'critical' }
     ]
   },
   {
@@ -193,69 +193,130 @@ const initialStations: Station[] = [
     windSpeed: 5,
     trackConditions: 'good',
     trains: [
-      { id: "EXP345", name: "Express 345", type: "express", status: "departing", platform: 2, speed: 95, destination: "Central Station", eta: new Date(Date.now() + 420000), passengers: 190, capacity: 200, currentSection: "South-Central", progress: 10, priority: 'normal', fuelLevel: 82, maintenanceStatus: 'good' },
-      { id: "LOC678", name: "Local 678", type: "passenger", status: "on-time", platform: 5, speed: 75, destination: "North Terminal", eta: new Date(Date.now() + 780000), passengers: 85, capacity: 150, currentSection: "South-North", progress: 60, priority: 'normal', fuelLevel: 90, maintenanceStatus: 'good' },
-      { id: "EXP901", name: "Express 901", type: "express", status: "on-time", platform: 7, speed: 115, destination: "Industrial Zone", eta: new Date(Date.now() + 360000), passengers: 175, capacity: 200, currentSection: "South-Industrial", progress: 30, priority: 'high', fuelLevel: 76, maintenanceStatus: 'good' },
-      { id: "FRT234", name: "Freight 234", type: "freight", status: "minor-delay", platform: 8, speed: 45, destination: "Port Terminal", eta: new Date(Date.now() + 1500000), currentSection: "South-Port", progress: 85, priority: 'low', fuelLevel: 65, maintenanceStatus: 'warning' }
+      { id: "SOUTHERN_STAR", name: "Southern Star", type: "express", status: "departing", platform: 2, speed: 95, destination: "Central Station", eta: new Date(Date.now() + 420000), passengers: 190, capacity: 200, currentSection: "South-Central", progress: 10, priority: 'normal', fuelLevel: 82, maintenanceStatus: 'good' },
+      { id: "COASTAL_SHUTTLE", name: "Coastal Shuttle", type: "passenger", status: "on-time", platform: 5, speed: 75, destination: "North Terminal", eta: new Date(Date.now() + 780000), passengers: 85, capacity: 150, currentSection: "South-North", progress: 60, priority: 'normal', fuelLevel: 90, maintenanceStatus: 'good' },
+      { id: "INDUSTRIAL_EXPRESS", name: "Industrial Express", type: "express", status: "on-time", platform: 7, speed: 115, destination: "Industrial Zone", eta: new Date(Date.now() + 360000), passengers: 175, capacity: 200, currentSection: "South-Industrial", progress: 30, priority: 'high', fuelLevel: 76, maintenanceStatus: 'good' },
+      { id: "CARGO_MASTER", name: "Cargo Master", type: "freight", status: "minor-delay", platform: 8, speed: 45, destination: "Port Terminal", eta: new Date(Date.now() + 1500000), currentSection: "South-Port", progress: 85, priority: 'low', fuelLevel: 65, maintenanceStatus: 'warning' }
+    ]
+  },
+  {
+    id: "industrial",
+    name: "Industrial Zone",
+    platforms: 4,
+    occupiedPlatforms: 2,
+    congestionLevel: 'low',
+    weatherCondition: 'clear',
+    temperature: 25,
+    windSpeed: 12,
+    trackConditions: 'good',
+    trains: [
+      { id: "STEEL_WORKER", name: "Steel Worker", type: "freight", status: "on-time", platform: 1, speed: 0, destination: "Central Station", eta: new Date(Date.now() + 1800000), currentSection: "Industrial-Central", progress: 0, priority: 'low', fuelLevel: 70, maintenanceStatus: 'good' },
+      { id: "CARGO_BEAST", name: "Cargo Beast", type: "freight", status: "on-time", platform: 3, speed: 0, destination: "Port Terminal", eta: new Date(Date.now() + 2400000), currentSection: "Industrial-Port", progress: 0, priority: 'low', fuelLevel: 85, maintenanceStatus: 'good' }
+    ]
+  },
+  {
+    id: "port",
+    name: "Port Terminal",
+    platforms: 6,
+    occupiedPlatforms: 3,
+    congestionLevel: 'medium',
+    weatherCondition: 'rain',
+    temperature: 20,
+    windSpeed: 18,
+    trackConditions: 'wet',
+    trains: [
+      { id: "OCEAN_FREIGHT", name: "Ocean Freight", type: "freight", status: "minor-delay", platform: 2, speed: 0, destination: "Industrial Zone", eta: new Date(Date.now() + 2100000), currentSection: "Port-Industrial", progress: 0, priority: 'low', fuelLevel: 60, maintenanceStatus: 'warning' },
+      { id: "HARBOR_EXPRESS", name: "Harbor Express", type: "express", status: "on-time", platform: 4, speed: 0, destination: "Central Station", eta: new Date(Date.now() + 1200000), passengers: 160, capacity: 200, currentSection: "Port-Central", progress: 0, priority: 'normal', fuelLevel: 88, maintenanceStatus: 'good' },
+      { id: "COASTAL_CARRIER", name: "Coastal Carrier", type: "freight", status: "on-time", platform: 6, speed: 0, destination: "South Terminal", eta: new Date(Date.now() + 1500000), currentSection: "Port-South", progress: 0, priority: 'low', fuelLevel: 75, maintenanceStatus: 'good' }
     ]
   }
 ];
 
 const initialSignals: Signal[] = [
-  { id: "SIG001", name: "Central Approach A", status: "green", trainId: "EXP001", position: "before", section: "Central-North", automatic: true },
-  { id: "SIG002", name: "Central Departure B", status: "yellow", trainId: "LOC456", position: "after", section: "Central-South", automatic: true },
-  { id: "SIG003", name: "North Junction", status: "red", trainId: "EXP002", position: "before", section: "North-Central", automatic: false },
-  { id: "SIG004", name: "South Approach", status: "green", trainId: "EXP345", position: "after", section: "South-Central", automatic: true }
+  { id: "SIG001", name: "Central Approach A", status: "green", trainId: "THUNDER_EXPRESS", position: "before", section: "Central-North", automatic: true },
+  { id: "SIG002", name: "Central Departure B", status: "yellow", trainId: "CITY_CONNECTOR", position: "after", section: "Central-South", automatic: true },
+  { id: "SIG003", name: "North Junction", status: "red", trainId: "ARCTIC_RUNNER", position: "before", section: "North-Central", automatic: false },
+  { id: "SIG004", name: "South Approach", status: "green", trainId: "SOUTHERN_STAR", position: "after", section: "South-Central", automatic: true }
 ];
 
 const initialTrackSections: TrackSection[] = [
   { 
     id: "Central-North", name: "Central to North", fromStation: "central", toStation: "north", 
-    length: 15, maxSpeed: 120, currentTrains: ["EXP001"], capacity: 2, status: 'operational', 
+    length: 15, maxSpeed: 120, currentTrains: ["THUNDER_EXPRESS"], capacity: 2, status: 'operational', 
     weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 7),
     nextMaintenance: new Date(Date.now() + 86400000 * 21), trackCondition: 'good', speedRestriction: 120
   },
   { 
     id: "Central-South", name: "Central to South", fromStation: "central", toStation: "south", 
-    length: 20, maxSpeed: 100, currentTrains: ["LOC456"], capacity: 3, status: 'operational', 
+    length: 20, maxSpeed: 100, currentTrains: ["CITY_CONNECTOR"], capacity: 3, status: 'operational', 
     weatherImpact: 0.8, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 14),
     nextMaintenance: new Date(Date.now() + 86400000 * 14), trackCondition: 'excellent', speedRestriction: 100
   },
   { 
     id: "North-Central", name: "North to Central", fromStation: "north", toStation: "central", 
-    length: 15, maxSpeed: 120, currentTrains: ["EXP002"], capacity: 2, status: 'reduced-speed', 
+    length: 15, maxSpeed: 120, currentTrains: ["ARCTIC_RUNNER"], capacity: 2, status: 'reduced-speed', 
     weatherImpact: 0.7, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 3),
     nextMaintenance: new Date(Date.now() + 86400000 * 25), trackCondition: 'fair', speedRestriction: 80
   },
   { 
     id: "South-Central", name: "South to Central", fromStation: "south", toStation: "central", 
-    length: 20, maxSpeed: 100, currentTrains: ["EXP345"], capacity: 3, status: 'operational', 
+    length: 20, maxSpeed: 100, currentTrains: ["SOUTHERN_STAR"], capacity: 3, status: 'operational', 
     weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 10),
     nextMaintenance: new Date(Date.now() + 86400000 * 18), trackCondition: 'good', speedRestriction: 100
   },
   { 
     id: "Central-Industrial", name: "Central to Industrial", fromStation: "central", toStation: "industrial", 
-    length: 25, maxSpeed: 80, currentTrains: ["FRT789"], capacity: 2, status: 'operational', 
+    length: 25, maxSpeed: 80, currentTrains: ["IRON_HAULER"], capacity: 2, status: 'operational', 
     weatherImpact: 0.95, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 21),
     nextMaintenance: new Date(Date.now() + 86400000 * 7), trackCondition: 'poor', speedRestriction: 60
   },
   { 
     id: "South-Industrial", name: "South to Industrial", fromStation: "south", toStation: "industrial", 
-    length: 30, maxSpeed: 80, currentTrains: ["EXP901"], capacity: 2, status: 'operational', 
+    length: 30, maxSpeed: 80, currentTrains: ["INDUSTRIAL_EXPRESS"], capacity: 2, status: 'operational', 
     weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 5),
     nextMaintenance: new Date(Date.now() + 86400000 * 23), trackCondition: 'good', speedRestriction: 80
   },
   { 
     id: "South-Port", name: "South to Port", fromStation: "south", toStation: "port", 
-    length: 35, maxSpeed: 60, currentTrains: ["FRT234"], capacity: 1, status: 'operational', 
+    length: 35, maxSpeed: 60, currentTrains: ["CARGO_MASTER"], capacity: 1, status: 'operational', 
     weatherImpact: 0.85, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 12),
     nextMaintenance: new Date(Date.now() + 86400000 * 16), trackCondition: 'fair', speedRestriction: 60
   },
   { 
     id: "North-South", name: "North to South", fromStation: "north", toStation: "south", 
-    length: 40, maxSpeed: 90, currentTrains: ["REG012"], capacity: 2, status: 'maintenance', 
+    length: 40, maxSpeed: 90, currentTrains: ["NORTHERN_BREEZE"], capacity: 2, status: 'maintenance', 
     weatherImpact: 0.6, blockStatus: 'blocked', lastMaintenance: new Date(Date.now() - 86400000 * 1),
     nextMaintenance: new Date(Date.now() + 86400000 * 1), trackCondition: 'poor', speedRestriction: 0
+  },
+  { 
+    id: "Industrial-Central", name: "Industrial to Central", fromStation: "industrial", toStation: "central", 
+    length: 25, maxSpeed: 80, currentTrains: ["STEEL_WORKER"], capacity: 2, status: 'operational', 
+    weatherImpact: 0.95, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 21),
+    nextMaintenance: new Date(Date.now() + 86400000 * 7), trackCondition: 'poor', speedRestriction: 60
+  },
+  { 
+    id: "Industrial-Port", name: "Industrial to Port", fromStation: "industrial", toStation: "port", 
+    length: 30, maxSpeed: 70, currentTrains: ["CARGO_BEAST"], capacity: 2, status: 'operational', 
+    weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 5),
+    nextMaintenance: new Date(Date.now() + 86400000 * 23), trackCondition: 'good', speedRestriction: 70
+  },
+  { 
+    id: "Port-Industrial", name: "Port to Industrial", fromStation: "port", toStation: "industrial", 
+    length: 30, maxSpeed: 70, currentTrains: ["OCEAN_FREIGHT"], capacity: 2, status: 'operational', 
+    weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 5),
+    nextMaintenance: new Date(Date.now() + 86400000 * 23), trackCondition: 'good', speedRestriction: 70
+  },
+  { 
+    id: "Port-Central", name: "Port to Central", fromStation: "port", toStation: "central", 
+    length: 35, maxSpeed: 80, currentTrains: ["HARBOR_EXPRESS"], capacity: 2, status: 'operational', 
+    weatherImpact: 0.85, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 12),
+    nextMaintenance: new Date(Date.now() + 86400000 * 16), trackCondition: 'fair', speedRestriction: 80
+  },
+  { 
+    id: "Port-South", name: "Port to South", fromStation: "port", toStation: "south", 
+    length: 25, maxSpeed: 60, currentTrains: ["COASTAL_CARRIER"], capacity: 1, status: 'operational', 
+    weatherImpact: 0.85, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 12),
+    nextMaintenance: new Date(Date.now() + 86400000 * 16), trackCondition: 'fair', speedRestriction: 60
   }
 ];
 
@@ -268,11 +329,11 @@ const initialRoutes: Route[] = [
 ];
 
 const initialTimetable: Timetable[] = [
-  { id: "T001", trainId: "EXP001", departureTime: new Date(Date.now() + 300000), arrivalTime: new Date(Date.now() + 900000), route: "R001", status: 'on-time', delay: 0 },
-  { id: "T002", trainId: "LOC456", departureTime: new Date(Date.now() + 600000), arrivalTime: new Date(Date.now() + 1200000), route: "R002", status: 'delayed', delay: 5 },
-  { id: "T003", trainId: "FRT789", departureTime: new Date(Date.now() + 900000), arrivalTime: new Date(Date.now() + 1800000), route: "R003", status: 'on-time', delay: 0 },
-  { id: "T004", trainId: "EXP002", departureTime: new Date(Date.now() + 240000), arrivalTime: new Date(Date.now() + 1200000), route: "R004", status: 'on-time', delay: 0 },
-  { id: "T005", trainId: "FRT234", departureTime: new Date(Date.now() + 1500000), arrivalTime: new Date(Date.now() + 3600000), route: "R005", status: 'delayed', delay: 15 }
+  { id: "T001", trainId: "THUNDER_EXPRESS", departureTime: new Date(Date.now() + 300000), arrivalTime: new Date(Date.now() + 900000), route: "R001", status: 'on-time', delay: 0 },
+  { id: "T002", trainId: "CITY_CONNECTOR", departureTime: new Date(Date.now() + 600000), arrivalTime: new Date(Date.now() + 1200000), route: "R002", status: 'delayed', delay: 5 },
+  { id: "T003", trainId: "IRON_HAULER", departureTime: new Date(Date.now() + 900000), arrivalTime: new Date(Date.now() + 1800000), route: "R003", status: 'on-time', delay: 0 },
+  { id: "T004", trainId: "ARCTIC_RUNNER", departureTime: new Date(Date.now() + 240000), arrivalTime: new Date(Date.now() + 1200000), route: "R004", status: 'on-time', delay: 0 },
+  { id: "T005", trainId: "CARGO_MASTER", departureTime: new Date(Date.now() + 1500000), arrivalTime: new Date(Date.now() + 3600000), route: "R005", status: 'delayed', delay: 15 }
 ];
 
 const scenarios = [
@@ -1251,100 +1312,558 @@ const Index = () => {
             {/* Content */}
             <div className="h-full flex items-center justify-center p-12 pt-20">
               {activeTab === "network" && (
-                <div className="w-full max-w-4xl">
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-semibold mb-2">Railway Network</h3>
+                <div className="w-full h-full overflow-auto">
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-semibold mb-2">🚂 Railway Network Map</h3>
                     <p className="text-sm" style={{ color: COLORS.textSecondary }}>
-                      Real-time train positions and station status
+                      Interactive railway network with real-time train positions
                     </p>
                   </div>
                   
-                  <div className="space-y-12">
-                    {stations.map((station, index) => (
-                      <div key={station.id} className="relative">
-                        {index < stations.length - 1 && (
+                  {/* Railway Map Container */}
+                  <div className="relative bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-8 min-h-[600px] overflow-hidden" style={{ border: `2px solid ${COLORS.border}` }}>
+                    {/* Map Grid Background */}
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="grid grid-cols-12 grid-rows-8 h-full">
+                        {Array.from({ length: 96 }).map((_, i) => (
+                          <div key={i} className="border border-gray-300"></div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Station Nodes */}
+                    <div className="relative z-10">
+                      {/* Central Station - Center */}
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="relative">
                           <div 
-                            className="absolute left-1/2 transform -translate-x-1/2 w-1 h-16 top-full"
-                            style={{ backgroundColor: COLORS.border }}
-                          />
-                        )}
-                        
-                        <div className="text-center mb-6">
-                          <div className="flex items-center justify-center gap-3 mb-2">
-                            <h4 className="text-lg font-semibold">{station.name}</h4>
-                            <Badge 
-                              className="rounded-full px-3 py-1"
-                              style={{ 
-                                backgroundColor: station.congestionLevel === 'high' ? COLORS.error :
-                                               station.congestionLevel === 'medium' ? COLORS.warning : COLORS.success,
-                                color: 'white'
-                              }}
-                            >
-                              {station.congestionLevel}
-                            </Badge>
-                            <Badge 
-                              className="rounded-full px-2 py-1"
-                              style={{ 
-                                backgroundColor: station.weatherCondition === 'clear' ? COLORS.success :
-                                               station.weatherCondition === 'rain' ? COLORS.passengerTrain :
-                                               station.weatherCondition === 'snow' ? COLORS.textMuted : COLORS.warning,
-                                color: 'white'
-                              }}
-                            >
-                              {station.weatherCondition === 'clear' ? '☀️' :
-                               station.weatherCondition === 'rain' ? '🌧️' :
-                               station.weatherCondition === 'snow' ? '❄️' : '🌫️'}
-                            </Badge>
+                            className="w-32 h-20 rounded-2xl border-4 shadow-lg cursor-pointer hover:scale-105 transition-all duration-300"
+                            style={{ 
+                              borderColor: stations[0].congestionLevel === 'high' ? COLORS.error :
+                                         stations[0].congestionLevel === 'medium' ? COLORS.warning : COLORS.success,
+                              backgroundColor: stations[0].congestionLevel === 'high' ? `${COLORS.error}15` :
+                                            stations[0].congestionLevel === 'medium' ? `${COLORS.warning}15` : `${COLORS.success}15`
+                            }}
+                            onClick={() => setSelectedStation(stations[0].id)}
+                          >
+                            <div className="p-3 text-center">
+                              <h4 className="font-bold text-sm mb-1">{stations[0].name}</h4>
+                              <div className="flex justify-center gap-1 mb-2">
+                                <Badge className="text-xs px-2 py-0" style={{ backgroundColor: COLORS.primaryAccent, color: COLORS.darkAccent }}>
+                                  {stations[0].occupiedPlatforms}/{stations[0].platforms}
+                                </Badge>
+                                <Badge className="text-xs px-2 py-0" style={{ backgroundColor: COLORS.textMuted, color: 'white' }}>
+                                  {stations[0].temperature}°C
+                                </Badge>
+                              </div>
+                              <div className="text-xs" style={{ color: COLORS.textSecondary }}>
+                                {stations[0].weatherCondition === 'clear' ? '☀️' :
+                                 stations[0].weatherCondition === 'rain' ? '🌧️' :
+                                 stations[0].weatherCondition === 'snow' ? '❄️' : '🌫️'} {stations[0].trackConditions}
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-sm" style={{ color: COLORS.textSecondary }}>
-                            {station.occupiedPlatforms}/{station.platforms} platforms • {station.trains.length} trains • {station.temperature}°C
-                          </p>
-                          <p className="text-xs" style={{ color: COLORS.textMuted }}>
-                            Track: {station.trackConditions} • Wind: {station.windSpeed} km/h
-                          </p>
-                        </div>
-                        
-                        <div className="flex gap-4 justify-center flex-wrap">
-                          {Array.from({ length: station.platforms }).map((_, platformIndex) => {
-                            const platformNumber = platformIndex + 1;
-                            const platformTrain = station.trains.find(t => t.platform === platformNumber);
-                            
-                            return (
-                              <div key={platformNumber} className="relative group">
+                          
+                          {/* Central Station Platforms */}
+                          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 flex gap-2">
+                            {Array.from({ length: Math.min(6, stations[0].platforms) }).map((_, i) => {
+                              const train = stations[0].trains.find(t => t.platform === i + 1);
+                              return (
                                 <div 
-                                  className="w-20 h-12 border-2 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-all duration-200"
+                                  key={i} 
+                                  className="w-8 h-6 rounded border cursor-pointer hover:scale-110 transition-all duration-200"
                                   style={{ 
-                                    borderColor: platformTrain ? getTrainColor(platformTrain.status, platformTrain.type) : COLORS.border,
-                                    backgroundColor: platformTrain ? `${getTrainColor(platformTrain.status, platformTrain.type)}15` : COLORS.cardBackground,
+                                    backgroundColor: train ? getTrainColor(train.status, train.type) : COLORS.lightGray,
+                                    borderColor: train ? getTrainColor(train.status, train.type) : COLORS.border
                                   }}
-                                  onClick={() => platformTrain && setSelectedTrain(platformTrain.id)}
+                                  onClick={() => train && setSelectedTrain(train.id)}
+                                  title={train ? `${train.name} - ${train.speed}km/h` : `Platform ${i + 1}`}
                                 >
-                                  {platformTrain ? (
-                                    <>
-                                      <span className="text-xs font-bold" style={{ color: getTrainColor(platformTrain.status, platformTrain.type) }}>
-                                        {platformTrain.id}
-                                      </span>
-                                      <span className="text-xs" style={{ color: COLORS.textMuted }}>
-                                        {platformTrain.speed}km/h
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <span className="text-sm" style={{ color: COLORS.textMuted }}>P{platformNumber}</span>
+                                  {train && (
+                                    <div className="text-xs text-center text-white font-bold leading-tight">
+                                      {train.id.split('_')[0].substring(0, 3)}
+                                    </div>
                                   )}
                                 </div>
-                                
-                                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-                                  <span className="text-xs" style={{ color: COLORS.textMuted }}>
-                                    Platform {platformNumber}
-                                  </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* North Terminal - Top */}
+                      <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
+                        <div className="relative">
+                          <div 
+                            className="w-28 h-16 rounded-xl border-3 shadow-lg cursor-pointer hover:scale-105 transition-all duration-300"
+                            style={{ 
+                              borderColor: stations[1].congestionLevel === 'high' ? COLORS.error :
+                                         stations[1].congestionLevel === 'medium' ? COLORS.warning : COLORS.success,
+                              backgroundColor: stations[1].congestionLevel === 'high' ? `${COLORS.error}15` :
+                                            stations[1].congestionLevel === 'medium' ? `${COLORS.warning}15` : `${COLORS.success}15`
+                            }}
+                            onClick={() => setSelectedStation(stations[1].id)}
+                          >
+                            <div className="p-2 text-center">
+                              <h4 className="font-bold text-xs mb-1">{stations[1].name}</h4>
+                              <div className="flex justify-center gap-1">
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.primaryAccent, color: COLORS.darkAccent }}>
+                                  {stations[1].occupiedPlatforms}/{stations[1].platforms}
+                                </Badge>
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.textMuted, color: 'white' }}>
+                                  {stations[1].temperature}°C
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* North Platforms */}
+                          <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex gap-1">
+                            {Array.from({ length: Math.min(4, stations[1].platforms) }).map((_, i) => {
+                              const train = stations[1].trains.find(t => t.platform === i + 1);
+                              return (
+                                <div 
+                                  key={i} 
+                                  className="w-6 h-4 rounded border cursor-pointer hover:scale-110 transition-all duration-200"
+                                  style={{ 
+                                    backgroundColor: train ? getTrainColor(train.status, train.type) : COLORS.lightGray,
+                                    borderColor: train ? getTrainColor(train.status, train.type) : COLORS.border
+                                  }}
+                                  onClick={() => train && setSelectedTrain(train.id)}
+                                  title={train ? `${train.name} - ${train.speed}km/h` : `Platform ${i + 1}`}
+                                >
+                                  {train && (
+                                    <div className="text-xs text-center text-white font-bold leading-tight">
+                                      {train.id.split('_')[0].substring(0, 2)}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* South Terminal - Bottom */}
+                      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                        <div className="relative">
+                          <div 
+                            className="w-32 h-16 rounded-xl border-3 shadow-lg cursor-pointer hover:scale-105 transition-all duration-300"
+                            style={{ 
+                              borderColor: stations[2].congestionLevel === 'high' ? COLORS.error :
+                                         stations[2].congestionLevel === 'medium' ? COLORS.warning : COLORS.success,
+                              backgroundColor: stations[2].congestionLevel === 'high' ? `${COLORS.error}15` :
+                                            stations[2].congestionLevel === 'medium' ? `${COLORS.warning}15` : `${COLORS.success}15`
+                            }}
+                            onClick={() => setSelectedStation(stations[2].id)}
+                          >
+                            <div className="p-2 text-center">
+                              <h4 className="font-bold text-xs mb-1">{stations[2].name}</h4>
+                              <div className="flex justify-center gap-1">
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.primaryAccent, color: COLORS.darkAccent }}>
+                                  {stations[2].occupiedPlatforms}/{stations[2].platforms}
+                                </Badge>
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.textMuted, color: 'white' }}>
+                                  {stations[2].temperature}°C
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* South Platforms */}
+                          <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 flex gap-1">
+                            {Array.from({ length: Math.min(8, stations[2].platforms) }).map((_, i) => {
+                              const train = stations[2].trains.find(t => t.platform === i + 1);
+                              return (
+                                <div 
+                                  key={i} 
+                                  className="w-6 h-4 rounded border cursor-pointer hover:scale-110 transition-all duration-200"
+                                  style={{ 
+                                    backgroundColor: train ? getTrainColor(train.status, train.type) : COLORS.lightGray,
+                                    borderColor: train ? getTrainColor(train.status, train.type) : COLORS.border
+                                  }}
+                                  onClick={() => train && setSelectedTrain(train.id)}
+                                  title={train ? `${train.name} - ${train.speed}km/h` : `Platform ${i + 1}`}
+                                >
+                                  {train && (
+                                    <div className="text-xs text-center text-white font-bold leading-tight">
+                                      {train.id.split('_')[0].substring(0, 2)}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Industrial Zone - Left */}
+                      <div className="absolute top-1/2 left-8 transform -translate-y-1/2">
+                        <div className="relative">
+                          <div 
+                            className="w-24 h-14 rounded-xl border-3 shadow-lg cursor-pointer hover:scale-105 transition-all duration-300"
+                            style={{ 
+                              borderColor: stations[3].congestionLevel === 'high' ? COLORS.error :
+                                         stations[3].congestionLevel === 'medium' ? COLORS.warning : COLORS.success,
+                              backgroundColor: stations[3].congestionLevel === 'high' ? `${COLORS.error}15` :
+                                            stations[3].congestionLevel === 'medium' ? `${COLORS.warning}15` : `${COLORS.success}15`
+                            }}
+                            onClick={() => setSelectedStation(stations[3].id)}
+                          >
+                            <div className="p-2 text-center">
+                              <h4 className="font-bold text-xs mb-1">{stations[3].name}</h4>
+                              <div className="flex justify-center gap-1">
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.primaryAccent, color: COLORS.darkAccent }}>
+                                  {stations[3].occupiedPlatforms}/{stations[3].platforms}
+                                </Badge>
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.textMuted, color: 'white' }}>
+                                  {stations[3].temperature}°C
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Industrial Platforms */}
+                          <div className="absolute -right-8 top-1/2 transform -translate-y-1/2 flex flex-col gap-1">
+                            {Array.from({ length: Math.min(4, stations[3].platforms) }).map((_, i) => {
+                              const train = stations[3].trains.find(t => t.platform === i + 1);
+                              return (
+                                <div 
+                                  key={i} 
+                                  className="w-4 h-6 rounded border cursor-pointer hover:scale-110 transition-all duration-200"
+                                  style={{ 
+                                    backgroundColor: train ? getTrainColor(train.status, train.type) : COLORS.lightGray,
+                                    borderColor: train ? getTrainColor(train.status, train.type) : COLORS.border
+                                  }}
+                                  onClick={() => train && setSelectedTrain(train.id)}
+                                  title={train ? `${train.name} - ${train.speed}km/h` : `Platform ${i + 1}`}
+                                >
+                                  {train && (
+                                    <div className="text-xs text-center text-white font-bold leading-tight transform rotate-90">
+                                      {train.id.split('_')[0].substring(0, 2)}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Port Terminal - Right */}
+                      <div className="absolute top-1/2 right-8 transform -translate-y-1/2">
+                        <div className="relative">
+                          <div 
+                            className="w-24 h-14 rounded-xl border-3 shadow-lg cursor-pointer hover:scale-105 transition-all duration-300"
+                            style={{ 
+                              borderColor: stations[4].congestionLevel === 'high' ? COLORS.error :
+                                         stations[4].congestionLevel === 'medium' ? COLORS.warning : COLORS.success,
+                              backgroundColor: stations[4].congestionLevel === 'high' ? `${COLORS.error}15` :
+                                            stations[4].congestionLevel === 'medium' ? `${COLORS.warning}15` : `${COLORS.success}15`
+                            }}
+                            onClick={() => setSelectedStation(stations[4].id)}
+                          >
+                            <div className="p-2 text-center">
+                              <h4 className="font-bold text-xs mb-1">{stations[4].name}</h4>
+                              <div className="flex justify-center gap-1">
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.primaryAccent, color: COLORS.darkAccent }}>
+                                  {stations[4].occupiedPlatforms}/{stations[4].platforms}
+                                </Badge>
+                                <Badge className="text-xs px-1 py-0" style={{ backgroundColor: COLORS.textMuted, color: 'white' }}>
+                                  {stations[4].temperature}°C
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Port Platforms */}
+                          <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 flex flex-col gap-1">
+                            {Array.from({ length: Math.min(6, stations[4].platforms) }).map((_, i) => {
+                              const train = stations[4].trains.find(t => t.platform === i + 1);
+                              return (
+                                <div 
+                                  key={i} 
+                                  className="w-4 h-6 rounded border cursor-pointer hover:scale-110 transition-all duration-200"
+                                  style={{ 
+                                    backgroundColor: train ? getTrainColor(train.status, train.type) : COLORS.lightGray,
+                                    borderColor: train ? getTrainColor(train.status, train.type) : COLORS.border
+                                  }}
+                                  onClick={() => train && setSelectedTrain(train.id)}
+                                  title={train ? `${train.name} - ${train.speed}km/h` : `Platform ${i + 1}`}
+                                >
+                                  {train && (
+                                    <div className="text-xs text-center text-white font-bold leading-tight transform rotate-90">
+                                      {train.id.split('_')[0].substring(0, 2)}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Track Connections */}
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+                        {/* Central to North */}
+                        <line 
+                          x1="50%" y1="50%" 
+                          x2="50%" y2="15%" 
+                          stroke={COLORS.border} 
+                          strokeWidth="4" 
+                          strokeDasharray="5,5"
+                        />
+                        {/* Central to South */}
+                        <line 
+                          x1="50%" y1="50%" 
+                          x2="50%" y2="85%" 
+                          stroke={COLORS.border} 
+                          strokeWidth="4" 
+                          strokeDasharray="5,5"
+                        />
+                        {/* Central to Industrial */}
+                        <line 
+                          x1="50%" y1="50%" 
+                          x2="15%" y2="50%" 
+                          stroke={COLORS.border} 
+                          strokeWidth="4" 
+                          strokeDasharray="5,5"
+                        />
+                        {/* Central to Port */}
+                        <line 
+                          x1="50%" y1="50%" 
+                          x2="85%" y2="50%" 
+                          stroke={COLORS.border} 
+                          strokeWidth="4" 
+                          strokeDasharray="5,5"
+                        />
+                        {/* Industrial to Port */}
+                        <line 
+                          x1="15%" y1="50%" 
+                          x2="85%" y2="50%" 
+                          stroke={COLORS.textMuted} 
+                          strokeWidth="3" 
+                          strokeDasharray="10,5"
+                        />
+                        {/* North to South (bypass) */}
+                        <path 
+                          d="M 50% 15% Q 25% 50% 50% 85%" 
+                          stroke={COLORS.textMuted} 
+                          strokeWidth="3" 
+                          fill="none"
+                          strokeDasharray="10,5"
+                        />
+                        {/* South to Port */}
+                        <path 
+                          d="M 50% 85% Q 70% 70% 85% 50%" 
+                          stroke={COLORS.textMuted} 
+                          strokeWidth="3" 
+                          fill="none"
+                          strokeDasharray="10,5"
+                        />
+                      </svg>
+                      
+                      {/* Moving Trains on Tracks */}
+                      {stations.flatMap(station => station.trains).map(train => {
+                        if (!train.currentSection) return null;
+                        const section = trackSections.find(s => s.id === train.currentSection);
+                        if (!section) return null;
+                        
+                        // Calculate position based on progress
+                        const progress = train.progress / 100;
+                        let x = 0, y = 0;
+                        
+                        if (section.id === "Central-North") {
+                          x = 50;
+                          y = 50 - (progress * 35);
+                        } else if (section.id === "North-Central") {
+                          x = 50;
+                          y = 15 + (progress * 35);
+                        } else if (section.id === "Central-South") {
+                          x = 50;
+                          y = 50 + (progress * 35);
+                        } else if (section.id === "South-Central") {
+                          x = 50;
+                          y = 85 - (progress * 35);
+                        } else if (section.id === "Central-Industrial") {
+                          x = 50 - (progress * 35);
+                          y = 50;
+                        } else if (section.id === "Industrial-Central") {
+                          x = 15 + (progress * 35);
+                          y = 50;
+                        } else if (section.id === "Central-Port") {
+                          x = 50 + (progress * 35);
+                          y = 50;
+                        } else if (section.id === "Port-Central") {
+                          x = 85 - (progress * 35);
+                          y = 50;
+                        } else if (section.id === "Industrial-Port") {
+                          x = 15 + (progress * 70);
+                          y = 50;
+                        } else if (section.id === "Port-Industrial") {
+                          x = 85 - (progress * 70);
+                          y = 50;
+                        } else if (section.id === "South-Port") {
+                          x = 50 + (progress * 35);
+                          y = 85 - (progress * 35);
+                        } else if (section.id === "Port-South") {
+                          x = 85 - (progress * 35);
+                          y = 50 + (progress * 35);
+                        }
+                        
+                        return (
+                          <div
+                            key={train.id}
+                            className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-125 transition-all duration-300"
+                            style={{ 
+                              left: `${x}%`, 
+                              top: `${y}%`,
+                              zIndex: 10
+                            }}
+                            onClick={() => setSelectedTrain(train.id)}
+                            title={`${train.name} - ${train.speed}km/h - ${train.destination}`}
+                          >
+                            <div 
+                              className="w-6 h-4 rounded border-2 shadow-lg"
+                              style={{ 
+                                backgroundColor: getTrainColor(train.status, train.type),
+                                borderColor: getTrainColor(train.status, train.type)
+                              }}
+                            >
+                              <div className="text-xs text-center text-white font-bold leading-tight">
+                                {train.id.split('_')[0].substring(0, 2)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Legend */}
+                    <div className="absolute bottom-4 left-4 bg-white rounded-lg p-3 shadow-lg" style={{ border: `1px solid ${COLORS.border}` }}>
+                      <h5 className="font-semibold text-sm mb-2">Legend</h5>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-2 rounded" style={{ backgroundColor: COLORS.onTimeTrain }}></div>
+                          <span>On Time</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-2 rounded" style={{ backgroundColor: COLORS.minorDelayTrain }}></div>
+                          <span>Minor Delay</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-2 rounded" style={{ backgroundColor: COLORS.significantDelayTrain }}></div>
+                          <span>Significant Delay</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-2 rounded border" style={{ borderColor: COLORS.border }}></div>
+                          <span>Empty Platform</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Network Stats */}
+                    <div className="absolute top-4 right-4 bg-white rounded-lg p-3 shadow-lg" style={{ border: `1px solid ${COLORS.border}` }}>
+                      <h5 className="font-semibold text-sm mb-2">Network Status</h5>
+                      <div className="space-y-1 text-xs">
+                        <div>Active Trains: {stations.flatMap(s => s.trains).length}</div>
+                        <div>Total Platforms: {stations.reduce((sum, s) => sum + s.platforms, 0)}</div>
+                        <div>Occupied: {stations.reduce((sum, s) => sum + s.occupiedPlatforms, 0)}</div>
+                        <div>Weather: {weatherCondition}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Selected Train/Station Details */}
+                  {(selectedTrain || selectedStation) && (
+                    <div className="mt-6 p-4 rounded-xl" style={{ backgroundColor: COLORS.cardBackground, border: `1px solid ${COLORS.border}` }}>
+                      {selectedTrain && (
+                        <div>
+                          <h4 className="font-semibold mb-2">Train Details: {selectedTrain}</h4>
+                          {(() => {
+                            const train = stations.flatMap(s => s.trains).find(t => t.id === selectedTrain);
+                            if (!train) return null;
+                            return (
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                  <span className="font-medium">Name:</span> {train.name}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Type:</span> {train.type}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Speed:</span> {train.speed} km/h
+                                </div>
+                                <div>
+                                  <span className="font-medium">Status:</span> {train.status}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Destination:</span> {train.destination}
+                                </div>
+                                <div>
+                                  <span className="font-medium">ETA:</span> {formatTime(train.eta)}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Fuel:</span> {train.fuelLevel}%
+                                </div>
+                                <div>
+                                  <span className="font-medium">Progress:</span> {Math.round(train.progress)}%
                                 </div>
                               </div>
                             );
-                          })}
+                          })()}
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      )}
+                      
+                      {selectedStation && (
+                        <div>
+                          <h4 className="font-semibold mb-2">Station Details: {selectedStation}</h4>
+                          {(() => {
+                            const station = stations.find(s => s.id === selectedStation);
+                            if (!station) return null;
+                            return (
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                  <span className="font-medium">Platforms:</span> {station.occupiedPlatforms}/{station.platforms}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Temperature:</span> {station.temperature}°C
+                                </div>
+                                <div>
+                                  <span className="font-medium">Weather:</span> {station.weatherCondition}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Track:</span> {station.trackConditions}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Wind:</span> {station.windSpeed} km/h
+                                </div>
+                                <div>
+                                  <span className="font-medium">Congestion:</span> {station.congestionLevel}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Trains:</span> {station.trains.length}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Status:</span> 
+                                  <Badge 
+                                    className="ml-1 text-xs"
+                                    style={{ 
+                                      backgroundColor: station.congestionLevel === 'high' ? COLORS.error :
+                                                     station.congestionLevel === 'medium' ? COLORS.warning : COLORS.success,
+                                      color: 'white'
+                                    }}
+                                  >
+                                    {station.congestionLevel}
+                                  </Badge>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
