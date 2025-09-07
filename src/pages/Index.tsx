@@ -122,6 +122,31 @@ interface TrackSection {
   capacity: number;
   status: 'operational' | 'maintenance' | 'blocked' | 'reduced-speed';
   weatherImpact: number; // 0-1 multiplier for speed
+  blockStatus: 'clear' | 'occupied' | 'reserved' | 'blocked';
+  lastMaintenance: Date;
+  nextMaintenance: Date;
+  trackCondition: 'excellent' | 'good' | 'fair' | 'poor';
+  speedRestriction: number; // km/h
+}
+
+interface Route {
+  id: string;
+  name: string;
+  sections: string[];
+  totalDistance: number;
+  estimatedTime: number;
+  priority: 'low' | 'normal' | 'high' | 'emergency';
+  conflicts: string[];
+}
+
+interface Timetable {
+  id: string;
+  trainId: string;
+  departureTime: Date;
+  arrivalTime: Date;
+  route: string;
+  status: 'scheduled' | 'on-time' | 'delayed' | 'cancelled';
+  delay: number; // minutes
 }
 
 // Initial simulation data
@@ -184,14 +209,70 @@ const initialSignals: Signal[] = [
 ];
 
 const initialTrackSections: TrackSection[] = [
-  { id: "Central-North", name: "Central to North", fromStation: "central", toStation: "north", length: 15, maxSpeed: 120, currentTrains: ["EXP001"], capacity: 2, status: 'operational', weatherImpact: 0.9 },
-  { id: "Central-South", name: "Central to South", fromStation: "central", toStation: "south", length: 20, maxSpeed: 100, currentTrains: ["LOC456"], capacity: 3, status: 'operational', weatherImpact: 0.8 },
-  { id: "North-Central", name: "North to Central", fromStation: "north", toStation: "central", length: 15, maxSpeed: 120, currentTrains: ["EXP002"], capacity: 2, status: 'reduced-speed', weatherImpact: 0.7 },
-  { id: "South-Central", name: "South to Central", fromStation: "south", toStation: "central", length: 20, maxSpeed: 100, currentTrains: ["EXP345"], capacity: 3, status: 'operational', weatherImpact: 0.9 },
-  { id: "Central-Industrial", name: "Central to Industrial", fromStation: "central", toStation: "industrial", length: 25, maxSpeed: 80, currentTrains: ["FRT789"], capacity: 2, status: 'operational', weatherImpact: 0.95 },
-  { id: "South-Industrial", name: "South to Industrial", fromStation: "south", toStation: "industrial", length: 30, maxSpeed: 80, currentTrains: ["EXP901"], capacity: 2, status: 'operational', weatherImpact: 0.9 },
-  { id: "South-Port", name: "South to Port", fromStation: "south", toStation: "port", length: 35, maxSpeed: 60, currentTrains: ["FRT234"], capacity: 1, status: 'operational', weatherImpact: 0.85 },
-  { id: "North-South", name: "North to South", fromStation: "north", toStation: "south", length: 40, maxSpeed: 90, currentTrains: ["REG012"], capacity: 2, status: 'maintenance', weatherImpact: 0.6 }
+  { 
+    id: "Central-North", name: "Central to North", fromStation: "central", toStation: "north", 
+    length: 15, maxSpeed: 120, currentTrains: ["EXP001"], capacity: 2, status: 'operational', 
+    weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 7),
+    nextMaintenance: new Date(Date.now() + 86400000 * 21), trackCondition: 'good', speedRestriction: 120
+  },
+  { 
+    id: "Central-South", name: "Central to South", fromStation: "central", toStation: "south", 
+    length: 20, maxSpeed: 100, currentTrains: ["LOC456"], capacity: 3, status: 'operational', 
+    weatherImpact: 0.8, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 14),
+    nextMaintenance: new Date(Date.now() + 86400000 * 14), trackCondition: 'excellent', speedRestriction: 100
+  },
+  { 
+    id: "North-Central", name: "North to Central", fromStation: "north", toStation: "central", 
+    length: 15, maxSpeed: 120, currentTrains: ["EXP002"], capacity: 2, status: 'reduced-speed', 
+    weatherImpact: 0.7, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 3),
+    nextMaintenance: new Date(Date.now() + 86400000 * 25), trackCondition: 'fair', speedRestriction: 80
+  },
+  { 
+    id: "South-Central", name: "South to Central", fromStation: "south", toStation: "central", 
+    length: 20, maxSpeed: 100, currentTrains: ["EXP345"], capacity: 3, status: 'operational', 
+    weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 10),
+    nextMaintenance: new Date(Date.now() + 86400000 * 18), trackCondition: 'good', speedRestriction: 100
+  },
+  { 
+    id: "Central-Industrial", name: "Central to Industrial", fromStation: "central", toStation: "industrial", 
+    length: 25, maxSpeed: 80, currentTrains: ["FRT789"], capacity: 2, status: 'operational', 
+    weatherImpact: 0.95, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 21),
+    nextMaintenance: new Date(Date.now() + 86400000 * 7), trackCondition: 'poor', speedRestriction: 60
+  },
+  { 
+    id: "South-Industrial", name: "South to Industrial", fromStation: "south", toStation: "industrial", 
+    length: 30, maxSpeed: 80, currentTrains: ["EXP901"], capacity: 2, status: 'operational', 
+    weatherImpact: 0.9, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 5),
+    nextMaintenance: new Date(Date.now() + 86400000 * 23), trackCondition: 'good', speedRestriction: 80
+  },
+  { 
+    id: "South-Port", name: "South to Port", fromStation: "south", toStation: "port", 
+    length: 35, maxSpeed: 60, currentTrains: ["FRT234"], capacity: 1, status: 'operational', 
+    weatherImpact: 0.85, blockStatus: 'occupied', lastMaintenance: new Date(Date.now() - 86400000 * 12),
+    nextMaintenance: new Date(Date.now() + 86400000 * 16), trackCondition: 'fair', speedRestriction: 60
+  },
+  { 
+    id: "North-South", name: "North to South", fromStation: "north", toStation: "south", 
+    length: 40, maxSpeed: 90, currentTrains: ["REG012"], capacity: 2, status: 'maintenance', 
+    weatherImpact: 0.6, blockStatus: 'blocked', lastMaintenance: new Date(Date.now() - 86400000 * 1),
+    nextMaintenance: new Date(Date.now() + 86400000 * 1), trackCondition: 'poor', speedRestriction: 0
+  }
+];
+
+const initialRoutes: Route[] = [
+  { id: "R001", name: "Express North Route", sections: ["Central-North"], totalDistance: 15, estimatedTime: 12, priority: 'high', conflicts: [] },
+  { id: "R002", name: "Express South Route", sections: ["Central-South"], totalDistance: 20, estimatedTime: 15, priority: 'high', conflicts: [] },
+  { id: "R003", name: "Freight Industrial Route", sections: ["Central-Industrial"], totalDistance: 25, estimatedTime: 25, priority: 'low', conflicts: [] },
+  { id: "R004", name: "Cross Country Route", sections: ["North-Central", "Central-South"], totalDistance: 35, estimatedTime: 28, priority: 'normal', conflicts: [] },
+  { id: "R005", name: "Port Connection Route", sections: ["South-Port"], totalDistance: 35, estimatedTime: 35, priority: 'normal', conflicts: [] }
+];
+
+const initialTimetable: Timetable[] = [
+  { id: "T001", trainId: "EXP001", departureTime: new Date(Date.now() + 300000), arrivalTime: new Date(Date.now() + 900000), route: "R001", status: 'on-time', delay: 0 },
+  { id: "T002", trainId: "LOC456", departureTime: new Date(Date.now() + 600000), arrivalTime: new Date(Date.now() + 1200000), route: "R002", status: 'delayed', delay: 5 },
+  { id: "T003", trainId: "FRT789", departureTime: new Date(Date.now() + 900000), arrivalTime: new Date(Date.now() + 1800000), route: "R003", status: 'on-time', delay: 0 },
+  { id: "T004", trainId: "EXP002", departureTime: new Date(Date.now() + 240000), arrivalTime: new Date(Date.now() + 1200000), route: "R004", status: 'on-time', delay: 0 },
+  { id: "T005", trainId: "FRT234", departureTime: new Date(Date.now() + 1500000), arrivalTime: new Date(Date.now() + 3600000), route: "R005", status: 'delayed', delay: 15 }
 ];
 
 const scenarios = [
@@ -270,11 +351,15 @@ const Index = () => {
   const [stations, setStations] = useState<Station[]>(initialStations);
   const [signals, setSignals] = useState<Signal[]>(initialSignals);
   const [trackSections, setTrackSections] = useState<TrackSection[]>(initialTrackSections);
+  const [routes, setRoutes] = useState<Route[]>(initialRoutes);
+  const [timetable, setTimetable] = useState<Timetable[]>(initialTimetable);
   const [events, setEvents] = useState<SimulationEvent[]>([]);
   const [selectedTrain, setSelectedTrain] = useState<string | null>(null);
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [weatherCondition, setWeatherCondition] = useState<'clear' | 'rain' | 'snow' | 'fog'>('clear');
+  const [conflictResolution, setConflictResolution] = useState<{[key: string]: string}>({});
   
   // UI state
   const [activeTab, setActiveTab] = useState("network");
@@ -695,6 +780,7 @@ const Index = () => {
           ...station,
           trains: station.trains.map(train => ({ ...train, status: 'on-time' as const }))
         })));
+        setTimetable(prev => prev.map(entry => ({ ...entry, status: 'on-time' as const, delay: 0 })));
         break;
       case 'optimize_routes':
         setStations(prev => prev.map(station => ({
@@ -709,6 +795,24 @@ const Index = () => {
           trains: station.trains.map(train => ({ ...train, priority: 'normal' as const }))
         })));
         break;
+      case 'resolve_conflicts':
+        setConflictResolution({});
+        setEvents(prev => [{
+          id: Date.now().toString(),
+          time: new Date(),
+          message: 'Route conflicts resolved automatically',
+          type: 'success',
+          severity: 'medium',
+          autoResolve: true
+        } as SimulationEvent, ...prev]);
+        break;
+      case 'schedule_maintenance':
+        setTrackSections(prev => prev.map(section => ({
+          ...section,
+          status: section.trackCondition === 'poor' ? 'maintenance' as const : section.status,
+          nextMaintenance: new Date(Date.now() + 86400000 * 7)
+        })));
+        break;
     }
     
     setEvents(prev => [{
@@ -716,6 +820,85 @@ const Index = () => {
       time: new Date(),
       message: `Quick action: ${action.replace('_', ' ')} executed`,
       type: 'success',
+      severity: 'medium',
+      autoResolve: true
+    } as SimulationEvent, ...prev]);
+  };
+
+  const handleRoutePlanning = (trainId: string, newRoute: string) => {
+    setUserActions(prev => prev + 1);
+    setStations(prev => prev.map(station => ({
+      ...station,
+      trains: station.trains.map(train => {
+        if (train.id === trainId) {
+          const route = routes.find(r => r.id === newRoute);
+          return { ...train, currentSection: route?.sections[0], destination: route?.name || train.destination };
+        }
+        return train;
+      })
+    })));
+    
+    setEvents(prev => [{
+      id: Date.now().toString(),
+      time: new Date(),
+      message: `Route planned for train ${trainId}: ${routes.find(r => r.id === newRoute)?.name}`,
+      type: 'info',
+      severity: 'medium',
+      trainId,
+      autoResolve: true
+    } as SimulationEvent, ...prev]);
+  };
+
+  const handleBlockControl = (sectionId: string, action: 'reserve' | 'clear' | 'block') => {
+    setUserActions(prev => prev + 1);
+    setTrackSections(prev => prev.map(section => {
+      if (section.id === sectionId) {
+        let newBlockStatus: 'clear' | 'occupied' | 'reserved' | 'blocked' = section.blockStatus;
+        let newStatus: 'operational' | 'maintenance' | 'blocked' | 'reduced-speed' = section.status;
+        
+        switch (action) {
+          case 'reserve':
+            newBlockStatus = 'reserved';
+            break;
+          case 'clear':
+            newBlockStatus = 'clear';
+            newStatus = 'operational';
+            break;
+          case 'block':
+            newBlockStatus = 'blocked';
+            newStatus = 'blocked';
+            break;
+        }
+        
+        return { ...section, blockStatus: newBlockStatus, status: newStatus };
+      }
+      return section;
+    }));
+    
+    setEvents(prev => [{
+      id: Date.now().toString(),
+      time: new Date(),
+      message: `Section ${sectionId} ${action}ed by traffic controller`,
+      type: 'info',
+      severity: 'medium',
+      autoResolve: true
+    } as SimulationEvent, ...prev]);
+  };
+
+  const handleSpeedRestriction = (sectionId: string, newSpeed: number) => {
+    setUserActions(prev => prev + 1);
+    setTrackSections(prev => prev.map(section => {
+      if (section.id === sectionId) {
+        return { ...section, speedRestriction: newSpeed };
+      }
+      return section;
+    }));
+    
+    setEvents(prev => [{
+      id: Date.now().toString(),
+      time: new Date(),
+      message: `Speed restriction set on ${sectionId}: ${newSpeed} km/h`,
+      type: 'warning',
       severity: 'medium',
       autoResolve: true
     } as SimulationEvent, ...prev]);
@@ -947,6 +1130,26 @@ const Index = () => {
                   <AlertTriangle className="h-4 w-4 mr-2" />
                   Clear Emergency
                 </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickAction('resolve_conflicts')}
+                  className="w-full justify-start"
+                  style={{ borderColor: COLORS.warning, color: COLORS.warning }}
+                >
+                  <Target className="h-4 w-4 mr-2" />
+                  Resolve Conflicts
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickAction('schedule_maintenance')}
+                  className="w-full justify-start"
+                  style={{ borderColor: COLORS.textMuted, color: COLORS.textMuted }}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Schedule Maintenance
+                </Button>
               </div>
             </Card>
 
@@ -1005,13 +1208,15 @@ const Index = () => {
           <div className="h-full bg-white rounded-2xl relative overflow-hidden shadow-sm" style={{ backgroundColor: COLORS.cardBackground, border: `1px solid ${COLORS.border}` }}>
             {/* Tab Navigation */}
             <div className="absolute top-6 left-6 z-10">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-96">
-                <TabsList className="grid w-full grid-cols-5 bg-gray-100 rounded-lg p-1">
-                  <TabsTrigger value="network" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">Network</TabsTrigger>
-                  <TabsTrigger value="signals" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">Signals</TabsTrigger>
-                  <TabsTrigger value="trains" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">Trains</TabsTrigger>
-                  <TabsTrigger value="tracks" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">Tracks</TabsTrigger>
-                  <TabsTrigger value="analytics" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">Analytics</TabsTrigger>
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl">
+                <TabsList className="grid w-full grid-cols-7 bg-gray-100 rounded-lg p-1">
+                  <TabsTrigger value="network" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs">Network</TabsTrigger>
+                  <TabsTrigger value="signals" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs">Signals</TabsTrigger>
+                  <TabsTrigger value="trains" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs">Trains</TabsTrigger>
+                  <TabsTrigger value="tracks" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs">Tracks</TabsTrigger>
+                  <TabsTrigger value="routes" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs">Routes</TabsTrigger>
+                  <TabsTrigger value="timetable" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs">Timetable</TabsTrigger>
+                  <TabsTrigger value="analytics" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs">Analytics</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -1277,40 +1482,66 @@ const Index = () => {
                               {train.priority.toUpperCase()}
                             </Badge>
                             
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="rounded-lg"
-                                onClick={() => handleTrainAction(train.id, 'hold')}
-                              >
-                                Hold
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="rounded-lg"
-                                onClick={() => handleTrainAction(train.id, 'expedite')}
-                              >
-                                Expedite
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="rounded-lg"
-                                onClick={() => handleTrainAction(train.id, 'emergency')}
-                                style={{ borderColor: COLORS.error, color: COLORS.error }}
-                              >
-                                Emergency
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="rounded-lg"
-                                onClick={() => handleTrainAction(train.id, 'maintenance')}
-                              >
-                                Service
-                              </Button>
+                            <div className="space-y-2">
+                              <div className="flex gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="rounded-lg"
+                                  onClick={() => handleTrainAction(train.id, 'hold')}
+                                >
+                                  Hold
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="rounded-lg"
+                                  onClick={() => handleTrainAction(train.id, 'expedite')}
+                                >
+                                  Expedite
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="rounded-lg"
+                                  onClick={() => handleTrainAction(train.id, 'emergency')}
+                                  style={{ borderColor: COLORS.error, color: COLORS.error }}
+                                >
+                                  Emergency
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="rounded-lg"
+                                  onClick={() => handleTrainAction(train.id, 'maintenance')}
+                                >
+                                  Service
+                                </Button>
+                              </div>
+                              
+                              <div className="flex gap-2">
+                                <Select onValueChange={(value) => handleRoutePlanning(train.id, value)}>
+                                  <SelectTrigger className="flex-1">
+                                    <SelectValue placeholder="Change Route" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {routes.map(route => (
+                                      <SelectItem key={route.id} value={route.id}>
+                                        {route.name} ({route.estimatedTime}min)
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="rounded-lg"
+                                  onClick={() => handleTrainAction(train.id, 'reroute')}
+                                  style={{ borderColor: COLORS.textMuted, color: COLORS.textMuted }}
+                                >
+                                  Auto Reroute
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1323,9 +1554,9 @@ const Index = () => {
               {activeTab === "tracks" && (
                 <div className="w-full max-w-6xl">
                   <div className="text-center mb-8">
-                    <h3 className="text-2xl font-semibold mb-2">Track Sections</h3>
+                    <h3 className="text-2xl font-semibold mb-2">Track Sections & Block Control</h3>
                     <p className="text-sm" style={{ color: COLORS.textSecondary }}>
-                      Monitor track conditions and capacity
+                      Monitor track conditions, block status, and maintenance schedules
                     </p>
                   </div>
                   
@@ -1339,23 +1570,51 @@ const Index = () => {
                               {section.fromStation} → {section.toStation} • {section.length}km
                             </p>
                           </div>
-                          <Badge 
-                            className="rounded-full px-3 py-1"
-                            style={{ 
-                              backgroundColor: section.status === 'operational' ? COLORS.success :
-                                             section.status === 'maintenance' ? COLORS.warning :
-                                             section.status === 'blocked' ? COLORS.error : COLORS.textMuted,
-                              color: 'white'
-                            }}
-                          >
-                            {section.status.toUpperCase()}
-                          </Badge>
+                          <div className="flex gap-2">
+                            <Badge 
+                              className="rounded-full px-3 py-1"
+                              style={{ 
+                                backgroundColor: section.status === 'operational' ? COLORS.success :
+                                               section.status === 'maintenance' ? COLORS.warning :
+                                               section.status === 'blocked' ? COLORS.error : COLORS.textMuted,
+                                color: 'white'
+                              }}
+                            >
+                              {section.status.toUpperCase()}
+                            </Badge>
+                            <Badge 
+                              className="rounded-full px-2 py-1"
+                              style={{ 
+                                backgroundColor: section.blockStatus === 'clear' ? COLORS.success :
+                                               section.blockStatus === 'occupied' ? COLORS.error :
+                                               section.blockStatus === 'blocked' ? COLORS.error : COLORS.warning,
+                                color: 'white'
+                              }}
+                            >
+                              {section.blockStatus.toUpperCase()}
+                            </Badge>
+                          </div>
                         </div>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-3 mb-4">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Max Speed:</span>
-                            <span className="text-sm font-semibold">{section.maxSpeed} km/h</span>
+                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Speed Limit:</span>
+                            <span className="text-sm font-semibold">{section.speedRestriction} km/h</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Track Condition:</span>
+                            <Badge 
+                              className="text-xs"
+                              style={{ 
+                                backgroundColor: section.trackCondition === 'excellent' ? COLORS.success :
+                                               section.trackCondition === 'good' ? COLORS.primaryAccent :
+                                               section.trackCondition === 'fair' ? COLORS.warning : COLORS.error,
+                                color: section.trackCondition === 'excellent' ? 'white' : COLORS.darkAccent
+                              }}
+                            >
+                              {section.trackCondition.toUpperCase()}
+                            </Badge>
                           </div>
                           
                           <div className="flex justify-between items-center">
@@ -1364,18 +1623,209 @@ const Index = () => {
                           </div>
                           
                           <div className="flex justify-between items-center">
-                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Weather Impact:</span>
-                            <span className="text-sm font-semibold">{Math.round(section.weatherImpact * 100)}%</span>
+                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Next Maintenance:</span>
+                            <span className="text-sm font-semibold">{formatTime(section.nextMaintenance)}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleBlockControl(section.id, 'reserve')}
+                              className="flex-1"
+                              style={{ borderColor: COLORS.warning, color: COLORS.warning }}
+                            >
+                              Reserve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleBlockControl(section.id, 'clear')}
+                              className="flex-1"
+                              style={{ borderColor: COLORS.success, color: COLORS.success }}
+                            >
+                              Clear
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleBlockControl(section.id, 'block')}
+                              className="flex-1"
+                              style={{ borderColor: COLORS.error, color: COLORS.error }}
+                            >
+                              Block
+                            </Button>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleSpeedRestriction(section.id, Math.max(20, section.speedRestriction - 20))}
+                              className="flex-1"
+                              style={{ borderColor: COLORS.textMuted, color: COLORS.textMuted }}
+                            >
+                              Speed ↓
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleSpeedRestriction(section.id, Math.min(140, section.speedRestriction + 20))}
+                              className="flex-1"
+                              style={{ borderColor: COLORS.primaryAccent, color: COLORS.darkAccent }}
+                            >
+                              Speed ↑
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "routes" && (
+                <div className="w-full max-w-6xl">
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-semibold mb-2">Route Planning & Management</h3>
+                    <p className="text-sm" style={{ color: COLORS.textSecondary }}>
+                      Plan and manage train routes with conflict detection
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-6">
+                    {routes.map(route => (
+                      <Card key={route.id} className="p-6 rounded-xl border hover:shadow-sm transition-shadow">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h4 className="font-semibold">{route.name}</h4>
+                            <p className="text-sm" style={{ color: COLORS.textSecondary }}>
+                              {route.sections.join(' → ')} • {route.totalDistance}km • {route.estimatedTime}min
+                            </p>
+                          </div>
+                          <Badge 
+                            className="rounded-full px-3 py-1"
+                            style={{ 
+                              backgroundColor: route.priority === 'emergency' ? COLORS.error :
+                                             route.priority === 'high' ? COLORS.warning :
+                                             route.priority === 'normal' ? COLORS.primaryAccent : COLORS.textMuted,
+                              color: route.priority === 'low' ? COLORS.darkAccent : 'white'
+                            }}
+                          >
+                            {route.priority.toUpperCase()}
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Sections:</span>
+                            <div className="flex gap-1">
+                              {route.sections.map(sectionId => (
+                                <Badge key={sectionId} className="text-xs px-2 py-0">
+                                  {sectionId}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
                           
                           <div className="flex justify-between items-center">
-                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Current Trains:</span>
-                            <div className="flex gap-1">
-                              {section.currentTrains.map(trainId => (
-                                <Badge key={trainId} className="text-xs px-2 py-0">
-                                  {trainId}
-                                </Badge>
-                              ))}
+                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Conflicts:</span>
+                            <span className="text-sm font-semibold" style={{ color: route.conflicts.length > 0 ? COLORS.error : COLORS.success }}>
+                              {route.conflicts.length > 0 ? `${route.conflicts.length} conflicts` : 'No conflicts'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm" style={{ color: COLORS.textSecondary }}>Estimated Time:</span>
+                            <span className="text-sm font-semibold">{route.estimatedTime} minutes</span>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "timetable" && (
+                <div className="w-full max-w-6xl">
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-semibold mb-2">Timetable & Schedule Management</h3>
+                    <p className="text-sm" style={{ color: COLORS.textSecondary }}>
+                      Monitor train schedules and manage delays
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {timetable.map(entry => (
+                      <Card key={entry.id} className="p-6 rounded-xl border hover:shadow-sm transition-shadow">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div 
+                              className="w-4 h-4 rounded-full"
+                              style={{ 
+                                backgroundColor: entry.status === 'on-time' ? COLORS.success :
+                                               entry.status === 'delayed' ? COLORS.warning :
+                                               entry.status === 'cancelled' ? COLORS.error : COLORS.textMuted
+                              }}
+                            />
+                            <div>
+                              <h4 className="font-semibold">{entry.trainId}</h4>
+                              <p className="text-sm" style={{ color: COLORS.textSecondary }}>
+                                Route: {entry.route} • Delay: {entry.delay}min
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-6">
+                            <div className="text-center">
+                              <div className="text-sm font-semibold">{formatTime(entry.departureTime)}</div>
+                              <div className="text-xs" style={{ color: COLORS.textSecondary }}>Departure</div>
+                            </div>
+                            
+                            <div className="text-center">
+                              <div className="text-sm font-semibold">{formatTime(entry.arrivalTime)}</div>
+                              <div className="text-xs" style={{ color: COLORS.textSecondary }}>Arrival</div>
+                            </div>
+                            
+                            <Badge 
+                              className="rounded-full px-3 py-1"
+                              style={{ 
+                                backgroundColor: entry.status === 'on-time' ? COLORS.success :
+                                               entry.status === 'delayed' ? COLORS.warning :
+                                               entry.status === 'cancelled' ? COLORS.error : COLORS.textMuted,
+                                color: 'white'
+                              }}
+                            >
+                              {entry.status.toUpperCase()}
+                            </Badge>
+                            
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="rounded-lg"
+                                onClick={() => {
+                                  setTimetable(prev => prev.map(t => 
+                                    t.id === entry.id ? { ...t, status: 'on-time' as const, delay: 0 } : t
+                                  ));
+                                }}
+                              >
+                                Clear Delay
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="rounded-lg"
+                                onClick={() => {
+                                  setTimetable(prev => prev.map(t => 
+                                    t.id === entry.id ? { ...t, status: 'cancelled' as const } : t
+                                  ));
+                                }}
+                                style={{ borderColor: COLORS.error, color: COLORS.error }}
+                              >
+                                Cancel
+                              </Button>
                             </div>
                           </div>
                         </div>
