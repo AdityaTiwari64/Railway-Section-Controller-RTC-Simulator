@@ -21,7 +21,11 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize,
-  Info
+  Info,
+  Radio,
+  Activity,
+  BarChart3,
+  RefreshCw
 } from "lucide-react";
 
 // Color palette constants
@@ -39,7 +43,11 @@ const COLORS = {
   minorDelayTrain: "#FFD166",
   significantDelayTrain: "#FF6B6B",
   freightTrain: "#8A4F7D",
-  passengerTrain: "#6A5ACD"
+  passengerTrain: "#6A5ACD",
+  signalGreen: "#00C9A7",
+  signalYellow: "#FFD166",
+  signalRed: "#FF6B6B",
+  signalOff: "#3B3B5C"
 };
 
 // Mock data
@@ -111,11 +119,49 @@ const kpis = {
   platformUtilization: 67
 };
 
+// Signal data for automated signaling system
+const signals = [
+  {
+    id: "S001",
+    name: "Signal A1",
+    status: "green",
+    trainId: "T123",
+    position: "before",
+    section: "Central-North"
+  },
+  {
+    id: "S002", 
+    name: "Signal A2",
+    status: "red",
+    trainId: "T456",
+    position: "after",
+    section: "Central-North"
+  },
+  {
+    id: "S003",
+    name: "Signal B1", 
+    status: "yellow",
+    trainId: "T789",
+    position: "before",
+    section: "North-South"
+  },
+  {
+    id: "S004",
+    name: "Signal B2",
+    status: "green", 
+    trainId: "T012",
+    position: "after",
+    section: "North-South"
+  }
+];
+
 const Index = () => {
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
   const [selectedTrain, setSelectedTrain] = useState<string | null>(null);
   const [simulationMode, setSimulationMode] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [activeTab, setActiveTab] = useState("map");
+  const [signals, setSignals] = useState(signals);
 
   const getTrainColor = (status: string, type: string) => {
     if (status === "on-time") return COLORS.onTimeTrain;
@@ -139,6 +185,105 @@ const Index = () => {
       case "reserved": return COLORS.alertHigh;
       default: return COLORS.secondaryAccent;
     }
+  };
+
+  const getSignalColor = (status: string) => {
+    switch (status) {
+      case "green": return COLORS.signalGreen;
+      case "yellow": return COLORS.signalYellow;
+      case "red": return COLORS.signalRed;
+      default: return COLORS.signalOff;
+    }
+  };
+
+  // Button handlers
+  const handleStartSimulation = () => {
+    setSimulationMode(true);
+    // Simulate signal changes during simulation
+    setTimeout(() => {
+      setSignals(prev => prev.map(signal => 
+        signal.status === "green" ? { ...signal, status: "yellow" } : signal
+      ));
+    }, 2000);
+  };
+
+  const handleStopSimulation = () => {
+    setSimulationMode(false);
+    // Reset signals
+    setSignals(prev => prev.map(signal => 
+      signal.status === "yellow" ? { ...signal, status: "green" } : signal
+    ));
+  };
+
+  const handleAcceptRecommendation = (recId: string) => {
+    console.log(`Accepted recommendation: ${recId}`);
+    // Implement recommendation logic here
+  };
+
+  const handleOverrideRecommendation = (recId: string) => {
+    console.log(`Overrode recommendation: ${recId}`);
+    // Override logic here
+  };
+
+  const handleViewStationMap = (stationId: string) => {
+    setSelectedStation(stationId);
+    setActiveTab("map");
+  };
+
+  const handleManagePlatforms = (stationId: string) => {
+    setSelectedStation(stationId);
+    setActiveTab("platforms");
+  };
+
+  const handleTrainClick = (trainId: string) => {
+    setSelectedTrain(trainId);
+  };
+
+  const handlePlatformClick = (platformNumber: number, stationId: string) => {
+    setSelectedStation(stationId);
+    setActiveTab("platforms");
+  };
+
+  const handleHoldTrain = (trainId: string) => {
+    console.log(`Holding train: ${trainId}`);
+    // Implement hold train logic
+  };
+
+  const handleRerouteTrain = (trainId: string) => {
+    console.log(`Rerouting train: ${trainId}`);
+    // Implement reroute logic
+  };
+
+  const handleReservePlatform = (stationId: string) => {
+    console.log(`Reserving platform for station: ${stationId}`);
+    // Implement reserve platform logic
+  };
+
+  const handleClearPlatform = (stationId: string) => {
+    console.log(`Clearing platform for station: ${stationId}`);
+    // Implement clear platform logic
+  };
+
+  const handleApplyChanges = () => {
+    console.log("Applying changes");
+    // Implement apply changes logic
+  };
+
+  const handleDiscardChanges = () => {
+    console.log("Discarding changes");
+    // Implement discard changes logic
+  };
+
+  const toggleSignal = (signalId: string) => {
+    setSignals(prev => prev.map(signal => 
+      signal.id === signalId 
+        ? { 
+            ...signal, 
+            status: signal.status === "green" ? "red" : 
+                   signal.status === "red" ? "yellow" : "green"
+          }
+        : signal
+    ));
   };
 
   return (
@@ -204,8 +349,9 @@ const Index = () => {
                         <div key={platformNumber} className="flex items-center justify-between">
                           <span className="text-xs" style={{ color: COLORS.textMediumContrast }}>Platform {platformNumber}</span>
                           <div 
-                            className="w-3 h-3 rounded-full" 
+                            className="w-3 h-3 rounded-full cursor-pointer" 
                             style={{ backgroundColor: getPlatformStatusColor(status) }}
+                            onClick={() => handlePlatformClick(platformNumber, station.id)}
                           />
                         </div>
                       );
@@ -216,7 +362,7 @@ const Index = () => {
                       size="sm" 
                       variant="outline"
                       style={{ borderColor: COLORS.primaryAccent, color: COLORS.primaryAccent }}
-                      onClick={() => setSelectedStation(station.id)}
+                      onClick={() => handleViewStationMap(station.id)}
                     >
                       View Map
                     </Button>
@@ -224,6 +370,7 @@ const Index = () => {
                       size="sm" 
                       variant="outline"
                       style={{ borderColor: COLORS.secondaryAccent, color: COLORS.secondaryAccent }}
+                      onClick={() => handleManagePlatforms(station.id)}
                     >
                       Manage
                     </Button>
@@ -237,6 +384,17 @@ const Index = () => {
         {/* Center Panel - Interactive Map */}
         <div className="flex-1 p-4">
           <div className="h-full bg-gray-900 rounded-lg relative overflow-hidden" style={{ backgroundColor: "#1E1E3F" }}>
+            {/* Tab Navigation */}
+            <div className="absolute top-4 left-4 z-10">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-48">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="map" style={{ color: COLORS.textHighContrast }}>Map</TabsTrigger>
+                  <TabsTrigger value="signals" style={{ color: COLORS.textHighContrast }}>Signals</TabsTrigger>
+                  <TabsTrigger value="charts" style={{ color: COLORS.textHighContrast }}>Charts</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
             {/* Map Controls */}
             <div className="absolute top-4 right-4 z-10 flex gap-2">
               <Button size="sm" variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textHighContrast }}>
@@ -250,60 +408,124 @@ const Index = () => {
               </Button>
             </div>
 
-            {/* Station Map Visualization */}
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="mb-4">
-                  <MapPin className="h-16 w-16 mx-auto mb-2" style={{ color: COLORS.primaryAccent }} />
-                  <h3 className="text-xl font-bold" style={{ color: COLORS.textHighContrast }}>
-                    {selectedStation ? stations.find(s => s.id === selectedStation)?.name : "Section Overview"}
-                  </h3>
-                </div>
-                
-                {/* Simplified station visualization */}
-                <div className="space-y-8">
-                  {stations.map((station) => (
-                    <div key={station.id} className="relative">
-                      <div className="text-sm mb-2" style={{ color: COLORS.textMediumContrast }}>{station.name}</div>
-                      <div className="flex gap-2 justify-center">
-                        {Array.from({ length: Math.min(station.platforms, 6) }).map((_, index) => {
-                          const platformNumber = index + 1;
-                          const platformTrain = station.trains.find(t => t.platform === platformNumber);
-                          
-                          return (
-                            <div 
-                              key={platformNumber}
-                              className="w-12 h-8 border rounded flex items-center justify-center text-xs cursor-pointer hover:opacity-80 transition-opacity"
-                              style={{ 
-                                borderColor: COLORS.borderAndSeparator,
-                                backgroundColor: platformTrain ? getTrainColor(platformTrain.status, platformTrain.type) : "#2A2A4E"
-                              }}
-                              onClick={() => setSelectedTrain(platformTrain?.id || null)}
-                            >
-                              {platformTrain ? platformTrain.id.slice(-2) : platformNumber}
-                            </div>
-                          );
-                        })}
+            {/* Content based on active tab */}
+            <div className="h-full flex items-center justify-center p-8">
+              {activeTab === "map" && (
+                <div className="text-center w-full">
+                  <div className="mb-4">
+                    <MapPin className="h-16 w-16 mx-auto mb-2" style={{ color: COLORS.primaryAccent }} />
+                    <h3 className="text-xl font-bold" style={{ color: COLORS.textHighContrast }}>
+                      {selectedStation ? stations.find(s => s.id === selectedStation)?.name : "Section Overview"}
+                    </h3>
+                  </div>
+                  
+                  {/* Simplified station visualization */}
+                  <div className="space-y-8">
+                    {stations.map((station) => (
+                      <div key={station.id} className="relative">
+                        <div className="text-sm mb-2" style={{ color: COLORS.textMediumContrast }}>{station.name}</div>
+                        <div className="flex gap-2 justify-center">
+                          {Array.from({ length: Math.min(station.platforms, 6) }).map((_, index) => {
+                            const platformNumber = index + 1;
+                            const platformTrain = station.trains.find(t => t.platform === platformNumber);
+                            
+                            return (
+                              <div 
+                                key={platformNumber}
+                                className="w-12 h-8 border rounded flex items-center justify-center text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                                style={{ 
+                                  borderColor: COLORS.borderAndSeparator,
+                                  backgroundColor: platformTrain ? getTrainColor(platformTrain.status, platformTrain.type) : "#2A2A4E"
+                                }}
+                                onClick={() => handleTrainClick(platformTrain?.id || null)}
+                              >
+                                {platformTrain ? platformTrain.id.slice(-2) : platformNumber}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-                {/* Train representations */}
-                <div className="mt-8 flex justify-center gap-4">
-                  {stations.flatMap(station => station.trains.slice(0, 2)).map((train) => (
-                    <div 
-                      key={train.id}
-                      className="flex items-center gap-2 px-3 py-1 rounded cursor-pointer hover:opacity-80 transition-opacity"
-                      style={{ backgroundColor: getTrainColor(train.status, train.type) }}
-                      onClick={() => setSelectedTrain(train.id)}
-                    >
-                      <Train className="h-4 w-4" />
-                      <span className="text-xs font-medium">{train.id}</span>
-                    </div>
-                  ))}
+                  {/* Train representations */}
+                  <div className="mt-8 flex justify-center gap-4">
+                    {stations.flatMap(station => station.trains.slice(0, 2)).map((train) => (
+                      <div 
+                        key={train.id}
+                        className="flex items-center gap-2 px-3 py-1 rounded cursor-pointer hover:opacity-80 transition-opacity"
+                        style={{ backgroundColor: getTrainColor(train.status, train.type) }}
+                        onClick={() => handleTrainClick(train.id)}
+                      >
+                        <Train className="h-4 w-4" />
+                        <span className="text-xs font-medium">{train.id}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {activeTab === "signals" && (
+                <div className="w-full">
+                  <h3 className="text-lg font-bold mb-6 text-center" style={{ color: COLORS.primaryAccent }}>Signal Control Panel</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {signals.map((signal) => (
+                      <Card key={signal.id} className="p-4" style={{ backgroundColor: "#252545", borderColor: COLORS.borderAndSeparator }}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="font-medium" style={{ color: COLORS.textHighContrast }}>{signal.name}</div>
+                            <div className="text-xs" style={{ color: COLORS.textMediumContrast }}>
+                              {signal.section} • {signal.position} train {signal.trainId}
+                            </div>
+                          </div>
+                          <div 
+                            className="w-4 h-4 rounded-full cursor-pointer border-2 border-gray-600"
+                            style={{ backgroundColor: getSignalColor(signal.status) }}
+                            onClick={() => toggleSignal(signal.id)}
+                          />
+                        </div>
+                        <div className="text-xs" style={{ color: COLORS.textMediumContrast }}>
+                          Status: {signal.status.toUpperCase()}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "charts" && (
+                <div className="w-full">
+                  <h3 className="text-lg font-bold mb-6 text-center" style={{ color: COLORS.primaryAccent }}>Performance Charts</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="p-4" style={{ backgroundColor: "#252545", borderColor: COLORS.borderAndSeparator }}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <BarChart3 className="h-5 w-5" style={{ color: COLORS.secondaryAccent }} />
+                        <span className="font-medium" style={{ color: COLORS.textHighContrast }}>Train Delays</span>
+                      </div>
+                      <div className="h-32 bg-gray-800 rounded flex items-end justify-around p-2">
+                        <div className="w-8 bg-blue-500 rounded-t" style={{ height: "60%" }}></div>
+                        <div className="w-8 bg-blue-500 rounded-t" style={{ height: "80%" }}></div>
+                        <div className="w-8 bg-blue-500 rounded-t" style={{ height: "40%" }}></div>
+                        <div className="w-8 bg-blue-500 rounded-t" style={{ height: "70%" }}></div>
+                        <div className="w-8 bg-blue-500 rounded-t" style={{ height: "90%" }}></div>
+                      </div>
+                    </Card>
+                    <Card className="p-4" style={{ backgroundColor: "#252545", borderColor: COLORS.borderAndSeparator }}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Activity className="h-5 w-5" style={{ color: COLORS.primaryAccent }} />
+                        <span className="font-medium" style={{ color: COLORS.textHighContrast }}>Platform Usage</span>
+                      </div>
+                      <div className="h-32 bg-gray-800 rounded flex items-end justify-around p-2">
+                        <div className="w-8 bg-green-500 rounded-t" style={{ height: "70%" }}></div>
+                        <div className="w-8 bg-green-500 rounded-t" style={{ height: "85%" }}></div>
+                        <div className="w-8 bg-green-500 rounded-t" style={{ height: "60%" }}></div>
+                        <div className="w-8 bg-green-500 rounded-t" style={{ height: "90%" }}></div>
+                        <div className="w-8 bg-green-500 rounded-t" style={{ height: "75%" }}></div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Simulation Mode Banner */}
@@ -359,6 +581,7 @@ const Index = () => {
                     <Button 
                       size="sm" 
                       style={{ backgroundColor: COLORS.primaryAccent, color: "#FFFFFF" }}
+                      onClick={() => handleAcceptRecommendation(rec.id)}
                     >
                       Accept
                     </Button>
@@ -366,6 +589,7 @@ const Index = () => {
                       size="sm" 
                       variant="outline"
                       style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textMediumContrast }}
+                      onClick={() => handleOverrideRecommendation(rec.id)}
                     >
                       Override
                     </Button>
@@ -384,7 +608,7 @@ const Index = () => {
             <Button 
               variant={simulationMode ? "default" : "outline"}
               style={simulationMode ? { backgroundColor: COLORS.alertHigh, color: "#000000" } : { borderColor: COLORS.borderAndSeparator, color: COLORS.textHighContrast }}
-              onClick={() => setSimulationMode(!simulationMode)}
+              onClick={simulationMode ? handleStopSimulation : handleStartSimulation}
             >
               {simulationMode ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
               {simulationMode ? "Stop Simulation" : "Start Simulation"}
@@ -397,10 +621,12 @@ const Index = () => {
           </div>
           
           <div className="flex gap-2">
-            <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textMediumContrast }}>
+            <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textMediumContrast }}
+                    onClick={handleApplyChanges}>
               Apply Changes
             </Button>
-            <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textMediumContrast }}>
+            <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textMediumContrast }}
+                    onClick={handleDiscardChanges}>
               Discard
             </Button>
           </div>
@@ -440,10 +666,12 @@ const Index = () => {
             </div>
             
             <div className="mt-4 flex gap-2">
-              <Button style={{ backgroundColor: COLORS.secondaryAccent, color: "#000000" }}>
+              <Button style={{ backgroundColor: COLORS.secondaryAccent, color: "#000000" }}
+                      onClick={() => handleReservePlatform(selectedStation)}>
                 Reserve Platform
               </Button>
-              <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textHighContrast }}>
+              <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textHighContrast }}
+                      onClick={() => handleClearPlatform(selectedStation)}>
                 Clear Platform
               </Button>
             </div>
@@ -512,10 +740,12 @@ const Index = () => {
             </div>
             
             <div className="mt-4 flex gap-2">
-              <Button style={{ backgroundColor: COLORS.primaryAccent, color: "#FFFFFF" }}>
+              <Button style={{ backgroundColor: COLORS.primaryAccent, color: "#FFFFFF" }}
+                      onClick={() => handleHoldTrain(selectedTrain)}>
                 Hold Train
               </Button>
-              <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textHighContrast }}>
+              <Button variant="outline" style={{ borderColor: COLORS.borderAndSeparator, color: COLORS.textHighContrast }}
+                      onClick={() => handleRerouteTrain(selectedTrain)}>
                 Reroute
               </Button>
             </div>
