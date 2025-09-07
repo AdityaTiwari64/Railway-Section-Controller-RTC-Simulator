@@ -1,0 +1,42 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Railway track background -->
+  <rect x="2" y="14" width="28" height="4" fill="#4A5568" rx="2"/>
+  <rect x="2" y="16" width="28" height="2" fill="#2D3748" rx="1"/>
+  
+  <!-- Railway ties -->
+  <rect x="4" y="12" width="2" height="8" fill="#2D3748"/>
+  <rect x="8" y="12" width="2" height="8" fill="#2D3748"/>
+  <rect x="12" y="12" width="2" height="8" fill="#2D3748"/>
+  <rect x="16" y="12" width="2" height="8" fill="#2D3748"/>
+  <rect x="20" y="12" width="2" height="8" fill="#2D3748"/>
+  <rect x="24" y="12" width="2" height="8" fill="#2D3748"/>
+  <rect x="28" y="12" width="2" height="8" fill="#2D3748"/>
+  
+  <!-- Train locomotive -->
+  <rect x="6" y="8" width="8" height="6" fill="#E53E3E" rx="1"/>
+  <rect x="7" y="9" width="6" height="4" fill="#FED7D7" rx="0.5"/>
+  
+  <!-- Train wheels -->
+  <circle cx="8" cy="16" r="1.5" fill="#2D3748"/>
+  <circle cx="12" cy="16" r="1.5" fill="#2D3748"/>
+  
+  <!-- Train cars -->
+  <rect x="15" y="9" width="6" height="5" fill="#3182CE" rx="1"/>
+  <rect x="16" y="10" width="4" height="3" fill="#BEE3F8" rx="0.5"/>
+  <circle cx="17" cy="16" r="1.5" fill="#2D3748"/>
+  <circle cx="19" cy="16" r="1.5" fill="#2D3748"/>
+  
+  <rect x="22" y="9" width="6" height="5" fill="#38A169" rx="1"/>
+  <rect x="23" y="10" width="4" height="3" fill="#C6F6D5" rx="0.5"/>
+  <circle cx="24" cy="16" r="1.5" fill="#2D3748"/>
+  <circle cx="26" cy="16" r="1.5" fill="#2D3748"/>
+  
+  <!-- Signal light -->
+  <rect x="1" y="4" width="3" height="8" fill="#4A5568" rx="1"/>
+  <circle cx="2.5" cy="6" r="1" fill="#38A169"/>
+  
+  <!-- Speed lines -->
+  <path d="M2 20 L6 20" stroke="#CBD5E0" stroke-width="1" stroke-linecap="round"/>
+  <path d="M2 22 L8 22" stroke="#CBD5E0" stroke-width="1" stroke-linecap="round"/>
+  <path d="M2 24 L6 24" stroke="#CBD5E0" stroke-width="1" stroke-linecap="round"/>
+</svg>
