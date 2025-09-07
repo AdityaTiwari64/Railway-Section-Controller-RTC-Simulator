@@ -120,7 +120,7 @@ const kpis = {
 };
 
 // Signal data for automated signaling system
-const signals = [
+const initialSignals = [
   {
     id: "S001",
     name: "Signal A1",
@@ -161,7 +161,7 @@ const Index = () => {
   const [simulationMode, setSimulationMode] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [activeTab, setActiveTab] = useState("map");
-  const [signals, setSignals] = useState(signals);
+  const [signals, setSignals] = useState(initialSignals);
 
   const getTrainColor = (status: string, type: string) => {
     if (status === "on-time") return COLORS.onTimeTrain;
